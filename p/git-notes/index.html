@@ -1,0 +1,550 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Git常用命令及GitLab CI/CD介绍"><title>Git Notes</title><link rel=canonical href=https://yuqiuwen.github.io/p/git-notes/><link rel=stylesheet href=/scss/style.min.4a914355c20926e8bdfe68714ac712c1fb2dc8c1d4ed7f5d9abd9d186f48784e.css><meta property='og:title' content="Git Notes"><meta property='og:description' content="Git常用命令及GitLab CI/CD介绍"><meta property='og:url' content='https://yuqiuwen.github.io/p/git-notes/'><meta property='og:site_name' content='yuqiuwen'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Git'><meta property='article:published_time' content='2023-04-12T00:00:00+00:00'><meta property='article:modified_time' content='2023-04-12T00:00:00+00:00'><meta name=twitter:title content="Git Notes"><meta name=twitter:description content="Git常用命令及GitLab CI/CD介绍"><link rel="shortcut icon" href=/img/favicon_hu_c31a0c718cbb325a.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"dark")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-nav><div class=site-nav__inner><a class=site-logo href=/>Yu.<span>QW</span></a><nav class=site-nav__links aria-label=主导航><a href=/>首页</a><a href=/projects/>作品集</a><a href=/post/ class=is-active aria-current=page>博客</a><a href=/food/>美食</a><a href=/about/>关于我</a><a href=/archives/>归档</a><a href=/search/>搜索</a></nav><button class=scheme-toggle id=dark-mode-toggle type=button aria-label="切换深色 / 浅色">
+<svg class="scheme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2m0 14.8v2.2M4.2 12H2m20 0h-2.2M6.2 6.2 4.7 4.7M19.3 19.3l-1.5-1.5m0-11.6 1.5-1.5M4.7 19.3l1.5-1.5"/></svg>
+<svg class="scheme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6.0 019.4 3.5a8.6 8.6.0 1011.1 11.1z"/></svg></button></div></header><main class=site-main><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E6%9C%AF/ style=background-color:#beefd9;color:#0f3d29>技术</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/git-notes/>Git Notes</a></h2><h3 class=article-subtitle>Git常用命令及GitLab CI/CD介绍</h3></div><footer class=article-meta><div class=inline-meta><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2023-04-12T00:00:00Z>2023 年 4 月 12 日</time>
+<svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 7 分钟</time></div></footer></div></header><aside class=article-toc><details><summary><div class=article-toc-title><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目录</span></div></summary><nav class=toc-nav id=TableOfContents><ol><li><a href=#经典git工作流>经典git工作流</a></li><li><a href=#简化git工作流基于环境>简化git工作流（基于环境）</a></li><li><a href=#常用命令>常用命令</a></li><li><a href=#分支操作>分支操作</a><ol><li><ol><li><a href=#创建一个新分支>创建一个新分支</a></li><li><a href=#基于当前分支创建新分支>基于当前分支创建新分支</a></li><li><a href=#从develop分支拉出一个新功能分支>从develop分支拉出一个新功能分支</a></li><li><a href=#从develop拉出一个release分支>从develop拉出一个release分支</a></li></ol></li><li><ol><li><a href=#拉取dev分支到当前本地分支>拉取dev分支到当前本地分支</a></li><li><a href=#本地项目和远程仓库关联>本地项目和远程仓库关联</a></li><li><a href=#回退>回退</a></li><li><a href=#删除某次提交>删除某次提交</a></li></ol></li></ol></li><li><a href=#开发流程>开发流程</a><ol><li><a href=#紧急修复工作流>紧急修复工作流</a></li><li><a href=#版本发布工作流>版本发布工作流</a></li><li><a href=#主分支同步到功能分支>主分支同步到功能分支</a></li></ol></li><li><a href=#分支类型>分支类型</a></li><li><a href=#提交规范>提交规范</a></li><li><a href=#生成密钥对>生成密钥对</a></li><li><a href=#gitlab-cicd>GitLab CI/CD</a></li><li><a href=#常见问题>常见问题</a></li></ol></nav></details></aside><section class=article-content><hr><p><img class=gallery-image data-flex-basis=242px data-flex-grow=101 height=1977 loading=lazy sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src=/p/git-notes/git-work-flow_hu_93a2a164244095a1.png srcset="/p/git-notes/git-work-flow_hu_21f8d9cc31d8096.png 800w, /p/git-notes/git-work-flow_hu_f2068bdf1f846b2.png 1600w, /p/git-notes/git-work-flow_hu_93a2a164244095a1.png 1999w" width=1999></p><h2 id=经典git工作流><a href=#%e7%bb%8f%e5%85%b8git%e5%b7%a5%e4%bd%9c%e6%b5%81 class=header-anchor></a>经典git工作流</h2><p><img class=gallery-image data-flex-basis=411px data-flex-grow=171 height=1050 loading=lazy sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src=/p/git-notes/git_branch_flow_overview_hu_3ee0b1891f7db9d1.png srcset="/p/git-notes/git_branch_flow_overview_hu_f51127351232b480.png 800w, /p/git-notes/git_branch_flow_overview_hu_c4555f57ba49ad28.png 1600w, /p/git-notes/git_branch_flow_overview_hu_3ee0b1891f7db9d1.png 1800w" width=1800></p><p><img class=gallery-image data-flex-basis=454px data-flex-grow=189 height=950 loading=lazy sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src=/p/git-notes/git_branch_flow_relationship_overview_hu_14519819ec6f875e.png srcset="/p/git-notes/git_branch_flow_relationship_overview_hu_8efa351f8edd73bc.png 800w, /p/git-notes/git_branch_flow_relationship_overview_hu_b9098bea19259aef.png 1600w, /p/git-notes/git_branch_flow_relationship_overview_hu_14519819ec6f875e.png 1800w" width=1800></p><h2 id=简化git工作流基于环境><a href=#%e7%ae%80%e5%8c%96git%e5%b7%a5%e4%bd%9c%e6%b5%81%e5%9f%ba%e4%ba%8e%e7%8e%af%e5%a2%83 class=header-anchor></a>简化git工作流（基于环境）</h2><p><img class=gallery-image data-flex-basis=264px data-flex-grow=110 height=723 loading=lazy sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src=/p/git-notes/Snipaste_2023-07-11_15-16-05_hu_5f017b4953733d1f.png width=798></p><p><p>功能开发/修复完成后合并到develop，测试通过后基于master创建发布分支release，release合并开发/修复分支后，部署上线， 验收通过并封版后合到master，看需要来打tag</p><ul><li>开发/缺陷分支只能合并稳定分支例如可以合并master分支，不可merge develop分支，作用是防止环境 污染</li><li>develop分支只能用于测试环境发布，不可直接合并到release分支，正确流程是在release分支合并开 发/缺陷分支</li></ul><h2 id=常用命令><a href=#%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4 class=header-anchor></a>常用命令</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 初始化git配置</span>
+</span></span><span class=line><span class=cl>git config --global user.name xxx
+</span></span><span class=line><span class=cl>git config --global user.email xxx
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看git配置</span>
+</span></span><span class=line><span class=cl>git config -l
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看git用户名 邮箱</span>
+</span></span><span class=line><span class=cl>git config user.name
+</span></span><span class=line><span class=cl>git config user.email
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 修改用户名</span>
+</span></span><span class=line><span class=cl>git config --global user.name <span class=o>{</span>用户名<span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>git remote -v   显示所有远程仓库
+</span></span><span class=line><span class=cl>git remote prune origin      删除本地有但在远程库已经不存在的分支
+</span></span><span class=line><span class=cl>git clone -b   克隆分支名 地址
+</span></span><span class=line><span class=cl>git remote add origin git@github.com:XXXXX/demo.git   新增远程仓库
+</span></span><span class=line><span class=cl>git remote set-url origin git@github.com:XXXXX/demo.git  修改远程仓库
+</span></span><span class=line><span class=cl>git remote set-url --add origin git@github.com:XXXXX/demo.git  添加多个远程仓库
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>git stash    不提交工作区内容
+</span></span><span class=line><span class=cl>git stash pop 恢复工作区
+</span></span><span class=line><span class=cl>git fetch   拉取远程分支
+</span></span><span class=line><span class=cl>git checkout -b develop origin/develop 
+</span></span><span class=line><span class=cl>git reset --hard &lt;commit ID号&gt; 回滚
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>git push -f origin master 推送到远程分支 
+</span></span><span class=line><span class=cl>git diff    查看工作区和暂存区的区别 
+</span></span><span class=line><span class=cl>git diff –cached    查看暂存区和版本库之间的区别 
+</span></span><span class=line><span class=cl>git diff HEAD   查看工作区和版本库之间的区别 
+</span></span><span class=line><span class=cl>git status   查看当前的工作状态
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>git branch -a 查看本地所有分支
+</span></span><span class=line><span class=cl>git branch -r 查看远程所有分支
+</span></span><span class=line><span class=cl>git branch -r --contains v0.10.2	查看远程tag属于哪一个分支
+</span></span><span class=line><span class=cl>git push --set-upstream origin online_help_20191024   推分支
+</span></span><span class=line><span class=cl>git push origin --delete dev20181018    删除远程分支
+</span></span><span class=line><span class=cl>git branch -d dev20181018   删除本地分支
+</span></span><span class=line><span class=cl>git cherry-pick 285c9477a759abdee94099e25e75e39e8c77d46b 合并指定版本
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>git tag -d tag-name		<span class=c1>#删除本地tag</span>
+</span></span><span class=line><span class=cl>git push origin --delete tag-name		<span class=c1>#删除远程tag</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=分支操作><a href=#%e5%88%86%e6%94%af%e6%93%8d%e4%bd%9c class=header-anchor></a>分支操作</h2><h4 id=创建一个新分支><a href=#%e5%88%9b%e5%bb%ba%e4%b8%80%e4%b8%aa%e6%96%b0%e5%88%86%e6%94%af class=header-anchor></a>创建一个新分支</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>git branch &lt;new_branch_name&gt;
+</span></span><span class=line><span class=cl>git checkout &lt;new_branch_name&gt;
+</span></span></code></pre></td></tr></table></div></div><h4 id=基于当前分支创建新分支><a href=#%e5%9f%ba%e4%ba%8e%e5%bd%93%e5%89%8d%e5%88%86%e6%94%af%e5%88%9b%e5%bb%ba%e6%96%b0%e5%88%86%e6%94%af class=header-anchor></a>基于当前分支创建新分支</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># 从main分支创建develop分支并切换到develop
+</span></span><span class=line><span class=cl>git pull origin main （可选）
+</span></span><span class=line><span class=cl>git checkout -b develop main
+</span></span><span class=line><span class=cl># 发布develop分支，使本地分支与远程develop关联
+</span></span><span class=line><span class=cl>git push -u origin develop
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 发布到main分支
+</span></span><span class=line><span class=cl>git checkout main  					# 切换到main分支
+</span></span><span class=line><span class=cl>git merge --no-ff develop			# 对develop分支进行合并
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>--no-ff 
+</span></span><span class=line><span class=cl>禁止使用快速合并模式，会生成一个新的提交，可以回退到main的上一次提交状态，
+</span></span><span class=line><span class=cl>如果不加此参数的话，只能回到develop的上一次提交
+</span></span></code></pre></td></tr></table></div></div><h4 id=从develop分支拉出一个新功能分支><a href=#%e4%bb%8edevelop%e5%88%86%e6%94%af%e6%8b%89%e5%87%ba%e4%b8%80%e4%b8%aa%e6%96%b0%e5%8a%9f%e8%83%bd%e5%88%86%e6%94%af class=header-anchor></a>从develop分支拉出一个新功能分支</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>git pull origin develop （可选）
+</span></span><span class=line><span class=cl>git checkout -b feature_v1.0 develop
+</span></span><span class=line><span class=cl>git push -u origin feature_v1.0
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 完成后，合并到develop分支
+</span></span><span class=line><span class=cl>git pull origin develop
+</span></span><span class=line><span class=cl>git checkout develop
+</span></span><span class=line><span class=cl>git merge --no-ff feature_v1.0			# 从feature分支合并到develop分支
+</span></span><span class=line><span class=cl>git branch -d feature_v1.0					# 删除feature分支，可选
+</span></span></code></pre></td></tr></table></div></div><h4 id=从develop拉出一个release分支><a href=#%e4%bb%8edevelop%e6%8b%89%e5%87%ba%e4%b8%80%e4%b8%aarelease%e5%88%86%e6%94%af class=header-anchor></a>从develop拉出一个release分支</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>git pull origin develop								#可选，获取最新版本
+</span></span><span class=line><span class=cl>git checkout -b release_v1.0 develop
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 完成release，合并到main分支和develop分支，在main打上tag标记
+</span></span><span class=line><span class=cl>git checkout main
+</span></span><span class=line><span class=cl>git merge --no-ff release_v1.0
+</span></span><span class=line><span class=cl>git tag release1.0 master
+</span></span><span class=line><span class=cl>git push origin v0.10.3	推送v0.10.3分支
+</span></span><span class=line><span class=cl>git push --tags	推送本地所有tags
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>#合并到develop
+</span></span><span class=line><span class=cl>git checkout develop
+</span></span><span class=line><span class=cl>git merge --no-ff release_v1.0
+</span></span></code></pre></td></tr></table></div></div><h3><a href=# class=header-anchor></a></h3><h4 id=拉取dev分支到当前本地分支><a href=#%e6%8b%89%e5%8f%96dev%e5%88%86%e6%94%af%e5%88%b0%e5%bd%93%e5%89%8d%e6%9c%ac%e5%9c%b0%e5%88%86%e6%94%af class=header-anchor></a>拉取dev分支到当前本地分支</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>先切换到本地分支v1.0
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>git pull origin dev:v1.0
+</span></span></code></pre></td></tr></table></div></div><h4 id=本地项目和远程仓库关联><a href=#%e6%9c%ac%e5%9c%b0%e9%a1%b9%e7%9b%ae%e5%92%8c%e8%bf%9c%e7%a8%8b%e4%bb%93%e5%ba%93%e5%85%b3%e8%81%94 class=header-anchor></a>本地项目和远程仓库关联</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git init
+</span></span><span class=line><span class=cl>git remote add origin &lt;remote url&gt;
+</span></span><span class=line><span class=cl>git fetch origin main				
+</span></span><span class=line><span class=cl>git branch --set-upstream-to<span class=o>=</span>origin/main main
+</span></span><span class=line><span class=cl>git add .
+</span></span><span class=line><span class=cl>git commit -m <span class=s2>&#34;xxx&#34;</span>
+</span></span><span class=line><span class=cl>git push
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>若远程分支不存在，git fetch origin main命令替换为git push -u origin main   
+</span></span></code></pre></td></tr></table></div></div><h4 id=回退><a href=#%e5%9b%9e%e9%80%80 class=header-anchor></a>回退</h4><ul><li>git revert</li></ul><p>revert仅仅是撤销指定commit的修改，并不影响后续的commit，但所撤销的commit被后续的commit修改了同一地方则会产生冲突；</p><ul><li>git reset 彻底回退到指定的commit版本，其后的commit会被删除</li></ul><p>git log找到commit id，然后git reset &lt;commit_id>，然后git push -f</p><h4 id=删除某次提交><a href=#%e5%88%a0%e9%99%a4%e6%9f%90%e6%ac%a1%e6%8f%90%e4%ba%a4 class=header-anchor></a>删除某次提交</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 1. 找到要删除的那个 commit 的**前一个** commit hash（比如 B）</span>
+</span></span><span class=line><span class=cl>git log --oneline
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 2. 启动交互式 rebase</span>
+</span></span><span class=line><span class=cl>git rebase -i &lt;commit-B-hash&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 或者用相对位置，比如删除倒数第 3 个</span>
+</span></span><span class=line><span class=cl>git rebase -i HEAD~3
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#把要删除的那行改成 drop 或直接删掉这一行：</span>
+</span></span><span class=line><span class=cl>drop c123456 commit C
+</span></span><span class=line><span class=cl>pick d234567 commit D
+</span></span><span class=line><span class=cl>pick e345678 commit E
+</span></span><span class=line><span class=cl><span class=c1># 保存退出，Git 会自动应用。</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 然后可能会出现：CONFLICT (content): Merge conflict in README.md error: could not apply 6cbbb27... feat:</span>
+</span></span><span class=line><span class=cl><span class=c1># 需要解决冲突 1. 查看冲突文件</span>
+</span></span><span class=line><span class=cl>git status
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 2. 手动编辑冲突文件（删掉 &lt;&lt;&lt; === &gt;&gt;&gt; 标记）</span>
+</span></span><span class=line><span class=cl>vim README.md
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 3. 标记为已解决</span>
+</span></span><span class=line><span class=cl>git add README.md
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 4. 继续 rebase</span>
+</span></span><span class=line><span class=cl>git rebase --continue
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 5. 如果又遇到冲突，重复 2-4</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#3. 强制推送到远程</span>
+</span></span><span class=line><span class=cl>git push origin -f
+</span></span></code></pre></td></tr></table></div></div><h2 id=开发流程><a href=#%e5%bc%80%e5%8f%91%e6%b5%81%e7%a8%8b class=header-anchor></a>开发流程</h2><ol><li>项目负责人从master的基线check out，初始化dev分支</li><li>开发者从dev分支check out，建立本地个人开发分支feature*</li><li>开发者完成功能开发后，commit个人feature*分支，并push至远程个人feature*分支</li><li>开发者在gitlab上提交个人的代码和并请求至dev分支</li><li>代码审查人负责代码审查，合并合理代码</li><li>代码提测时，开发负责人提交dev分支到test的合并请求</li><li>项目负责人合并dev分支至test分支</li><li>版本测试完成后，开发负责人提交test分支至master分支的合并请求</li><li>项目负责人合并代码至master</li><li>项目负责人以当前代码为基线，在master分支上tag当前版本号</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git tag -a v1.0.0 -m <span class=s2>&#34;Release v1.0.0&#34;</span> <span class=c1># 或 git tag v1.0.0</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>git push origin v1.0.0
+</span></span></code></pre></td></tr></table></div></div><h3 id=紧急修复工作流><a href=#%e7%b4%a7%e6%80%a5%e4%bf%ae%e5%a4%8d%e5%b7%a5%e4%bd%9c%e6%b5%81 class=header-anchor></a>紧急修复工作流</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl>git checkout master
+</span></span><span class=line><span class=cl>git checkout -b hotfix/1.2.1
+</span></span><span class=line><span class=cl># gerrit切出hotfix/1.2.1分支
+</span></span><span class=line><span class=cl># 修复完成
+</span></span><span class=line><span class=cl># 合并到master
+</span></span><span class=line><span class=cl>git push origin HEAD:refs/for/master
+</span></span><span class=line><span class=cl># 合并到develop
+</span></span><span class=line><span class=cl>git push origin HEAD:refs/for/develop
+</span></span></code></pre></td></tr></table></div></div><h3 id=版本发布工作流><a href=#%e7%89%88%e6%9c%ac%e5%8f%91%e5%b8%83%e5%b7%a5%e4%bd%9c%e6%b5%81 class=header-anchor></a>版本发布工作流</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-plain data-lang=plain><span class=line><span class=cl># 获取预先规划的版本号，并根据实际更新内容修改版本号
+</span></span><span class=line><span class=cl># 确保规划的问题修复和功能开发均已合并到develop
+</span></span><span class=line><span class=cl># gerrit上创建release/1.2.0分支
+</span></span><span class=line><span class=cl># 全量测试并生成固件
+</span></span><span class=line><span class=cl># 软件
+</span></span><span class=line><span class=cl># 修 bug、验证
+</span></span><span class=line><span class=cl>git push origin HEAD:refs/for/master
+</span></span><span class=line><span class=cl>git tag -a v1.0.0 -m &#34;Release v1.0.0&#34;
+</span></span><span class=line><span class=cl>git checkout develop
+</span></span><span class=line><span class=cl>git merge release/1.2.0
+</span></span><span class=line><span class=cl>git push origin HEAD:refs/for/develop
+</span></span><span class=line><span class=cl># 删除release/1.2.0分支
+</span></span></code></pre></td></tr></table></div></div><h3 id=主分支同步到功能分支><a href=#%e4%b8%bb%e5%88%86%e6%94%af%e5%90%8c%e6%ad%a5%e5%88%b0%e5%8a%9f%e8%83%bd%e5%88%86%e6%94%af class=header-anchor></a>主分支同步到功能分支</h3><blockquote><p>如果是仅个人的功能分支，推荐用rebase保持干净历史，多人开发的功能分支用merge</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 更新development</span>
+</span></span><span class=line><span class=cl>git checkout development
+</span></span><span class=line><span class=cl>git pull origin development
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 切回功能分支</span>
+</span></span><span class=line><span class=cl>git checkout feature-branch
+</span></span><span class=line><span class=cl>git rebase development
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 如果有冲突</span>
+</span></span><span class=line><span class=cl><span class=c1># 解决冲突后</span>
+</span></span><span class=line><span class=cl>git add .
+</span></span><span class=line><span class=cl>git rebase --continue
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 强制推送</span>
+</span></span><span class=line><span class=cl>git push --force-with-lease
+</span></span></code></pre></td></tr></table></div></div><h2 id=分支类型><a href=#%e5%88%86%e6%94%af%e7%b1%bb%e5%9e%8b class=header-anchor></a>分支类型</h2><p><img class=gallery-image data-flex-basis=390px data-flex-grow=162 height=327 loading=lazy sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="https://cdn.nlark.com/yuque/0/2023/png/34802521/1678679735611-36260812-5d4d-4c42-97ad-fe7beecc7916.png#averageHue=%23f0dfd9&clientId=uad1ce3dc-a63b-4&from=paste&id=u562805a8&originHeight=327&originWidth=532&originalType=url&ratio=1.100000023841858&rotation=0&showTitle=false&status=done&style=none&taskId=uf4dc8fe7-e224-4542-85f7-6001f6498d5&title=" width=532></p><p>开发分支: feat/xxx(功能)_20200804(创建日期)开发分支基于master创建，开发完成合并到测试develop分支
+测试分支：develop 只用来发布测试环境
+发布分支：release/vx.x.x(版本号)_20200804(创建日期)，基于master创建，验收完成，进行封版后合并回master
+缺陷分支：hotfix/xxx(功能)_20200804(创建日期)合并流程和开发分支一致，区别在于，hotfix在测试环境测试通过后直接合到最新的release分支验收</p><h2 id=提交规范><a href=#%e6%8f%90%e4%ba%a4%e8%a7%84%e8%8c%83 class=header-anchor></a>提交规范</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl>commit 规范：
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>feat: ⼀个新特性
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>fix: 修了⼀个 Bug
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>docs: 更新了⽂档（⽐如改了 Readme）
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>style: 代码的样式美化，不涉及到功能修改（⽐如改了缩进，css修改不算）
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>refactor: ⼀些代码结构上优化，既不是新特性也不是修 Bug（⽐如函数改个名字）
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>perf: 优化了性能的代码改动
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>test: 新增或者修改已有的测试代码
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>chore: 跟仓库主要业务⽆关的构建/⼯程依赖/⼯具等功能改动（⽐如新增⼀个⽂档⽣成⼯具）
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>操作规范（技巧）：
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>在代码push 前先 pull
+</span></span><span class=line><span class=cl>遇到代码冲突时，最先考虑取最近commit的版本，若想撤销本次拉取 执行git revert --abort
+</span></span><span class=line><span class=cl>正在开发发现分支错了，执行 git stash，切换分支后，执行git stash pop
+</span></span><span class=line><span class=cl>只想合并其他分支的某条commit 记录 执行 git cherry-pick commitId
+</span></span><span class=line><span class=cl>开发分支新建必须基于干净版本，合并到稳定版本前必须是验收通过的版本
+</span></span><span class=line><span class=cl>开发分支不能合并其他正在开发或者非干净分支
+</span></span></code></pre></td></tr></table></div></div><div class=table-wrapper><table><thead><tr><th>提交类型</th><th>含义</th></tr></thead><tbody><tr><td>feat</td><td>新功能（feature）</td></tr><tr><td>fix</td><td>修复 bug</td></tr><tr><td>perf</td><td>性能优化</td></tr><tr><td>refactor</td><td>重构代码</td></tr><tr><td>docs</td><td>文档相关</td></tr><tr><td>style</td><td>样式相关</td></tr><tr><td>test</td><td>测试相关</td></tr><tr><td>chore</td><td>构建过程或辅助工具的变动</td></tr></tbody></table></div><h2 id=生成密钥对><a href=#%e7%94%9f%e6%88%90%e5%af%86%e9%92%a5%e5%af%b9 class=header-anchor></a>生成密钥对</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>ssh-keygen -t ed25519 -C <span class=s2>&#34;your_email@example.com&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 拷贝</span>
+</span></span><span class=line><span class=cl><span class=c1>## mac</span>
+</span></span><span class=line><span class=cl>pbcopy &lt; ~/.ssh/id_ed25519.pub
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## linux</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>## win</span>
+</span></span><span class=line><span class=cl> cat ~/.ssh/id_ed25519.pub <span class=p>|</span> clip
+</span></span></code></pre></td></tr></table></div></div><h2 id=gitlab-cicd><a href=#gitlab-cicd class=header-anchor></a>GitLab CI/CD</h2><p>项目根目录下新建.gitlab-ci.yml文件</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>variables</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>PIP_CACHE_DIR</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;$CI_PROJECT_DIR/.cache/pip&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c># 缓存配置，加快项目的构建速度，减少重复下载</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>cache</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>key</span><span class=p>:</span><span class=w> </span><span class=l>$CI_JOB_NAME-$CI_COMMIT_REF_SLUG	# job名称-提交的分支名称</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>paths</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>${PIP_CACHE_DIR}		# 需要被缓存的文件或文件夹的路径</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c># 定义pipeline</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>stages</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>lint</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>test</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c># 定义了2个job</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>lint_job</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>stage</span><span class=p>:</span><span class=w> </span><span class=l>lint				# 属于哪个stage</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>python:3.7	# 需要的docker镜像</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=l>before_script:		# job开始之前执行的脚本</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>pip install flake8 -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=l>script:						# 执行脚本</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>flake8 app</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>test_job</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>stage</span><span class=p>:</span><span class=w> </span><span class=l>test</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>python:3.7</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=l>services:	# 启动名为 postgres 的服务</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>postgres</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>variables</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>POSTGRES_HOST</span><span class=p>:</span><span class=w> </span><span class=l>postgres</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>POSTGRES_PORT</span><span class=p>:</span><span class=w> </span><span class=m>5432</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>POSTGRES_USER</span><span class=p>:</span><span class=w> </span><span class=l>postgres</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>POSTGRES_PASS</span><span class=p>:</span><span class=w> </span><span class=l>postgres</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>POSTGRES_DB</span><span class=p>:</span><span class=w> </span><span class=l>oa_performance_test</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>POSTGRES_PASSWORD</span><span class=p>:</span><span class=w> </span><span class=l>postgres</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>before_script</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>pip install -r requirements-test.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>script</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>echo &#34;Test started.&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c># - coverage run --source app -m pytest tests</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c># - coverage report</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>echo &#34;Test finished.&#34;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=常见问题><a href=#%e5%b8%b8%e8%a7%81%e9%97%ae%e9%a2%98 class=header-anchor></a>常见问题</h2><ol><li><p>fatal: refusing to merge unrelated histories
+git merge main &ndash;allow-unrelated-histories</p></li><li><p>pull时提示：your local changes will be overwritten by merge&mldr;
+先git stash changes，然后pull更新，然后git stash pop</p></li><li><p>忽略已跟踪的某个文件或目录
+git rm &ndash;cached /path/file 或
+git rm -r &ndash;cached logs/</p></li></ol></section><footer class="article-meta article-footer"><section class=article-tags><a href=/tags/git/>Git</a></section></footer><nav class=article-prevnext aria-label=相邻文章><a class="article-prevnext__item article-prevnext__item--older" href=/p/python-notes/ rel=prev><span class=article-prevnext__label><svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+<span>上一篇</span>
+</span><span class=article-prevnext__title>Python & 后端</span>
+<span class=article-prevnext__date>2023.01.07</span>
+</a><a class="article-prevnext__item article-prevnext__item--newer" href=/p/database/ rel=next><span class=article-prevnext__label><span>下一篇</span>
+<svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+</span><span class=article-prevnext__title>数据库</span>
+<span class=article-prevnext__date>2023.07.11</span></a></nav></article><script type=module>
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main><footer class=site-footer><div class=site-footer__inner><div class=site-footer__cta><h2>有想法？<br><span>我们聊聊。</span></h2><a class=site-footer__email href=mailto:yuqiuwen2020@gmail.com>yuqiuwen2020@gmail.com ↗</a></div><div class=site-footer__bottom><span>© 2026 Yu Qiuwen</span><div class=site-footer__social><a href=mailto:yuqiuwen2020@gmail.com><svg class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg>
+<span>Email</span>
+</a><a href=https://github.com/yuqiuwen target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+<span>GitHub</span>
+</a><a href=/index.xml target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="5" cy="19" r="1"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg>
+<span>RSS</span></a></div></div></div></footer><script src=/js/gate.min.2d3ffea2c40fd0275c673de6c9daa61d0491889ed40ec7f56751951b9d0022f0.js integrity="sha256-LT/+osQP0CdcZz3mydqmHQSRiJ7UDsf1Z1GVG50AIvA=" defer></script><script type=text/javascript src=/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js defer></script></body></html>

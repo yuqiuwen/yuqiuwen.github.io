@@ -1,0 +1,1454 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="由于工作中经常用到这两个库，不过基本上用的fabric来实现环境部署、预检、数据上传下发等操作。因此，本文重点介绍Fabric的使用（fabric2版本）。"><title>自动化运维工具Paramiko & Fabric</title><link rel=canonical href=https://yuqiuwen.github.io/p/paramiko-fabric/><link rel=stylesheet href=/scss/style.min.4a914355c20926e8bdfe68714ac712c1fb2dc8c1d4ed7f5d9abd9d186f48784e.css><meta property='og:title' content="自动化运维工具Paramiko & Fabric"><meta property='og:description' content="由于工作中经常用到这两个库，不过基本上用的fabric来实现环境部署、预检、数据上传下发等操作。因此，本文重点介绍Fabric的使用（fabric2版本）。"><meta property='og:url' content='https://yuqiuwen.github.io/p/paramiko-fabric/'><meta property='og:site_name' content='yuqiuwen'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Paramiko'><meta property='article:tag' content='Fabric'><meta property='article:tag' content='DevOps'><meta property='article:tag' content='Python'><meta property='article:published_time' content='2022-10-30T00:00:00+00:00'><meta property='article:modified_time' content='2022-10-30T00:00:00+00:00'><meta name=twitter:title content="自动化运维工具Paramiko & Fabric"><meta name=twitter:description content="由于工作中经常用到这两个库，不过基本上用的fabric来实现环境部署、预检、数据上传下发等操作。因此，本文重点介绍Fabric的使用（fabric2版本）。"><link rel="shortcut icon" href=/img/favicon_hu_c31a0c718cbb325a.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"dark")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-nav><div class=site-nav__inner><a class=site-logo href=/>Yu.<span>QW</span></a><nav class=site-nav__links aria-label=主导航><a href=/>首页</a><a href=/projects/>作品集</a><a href=/post/ class=is-active aria-current=page>博客</a><a href=/food/>美食</a><a href=/about/>关于我</a><a href=/archives/>归档</a><a href=/search/>搜索</a></nav><button class=scheme-toggle id=dark-mode-toggle type=button aria-label="切换深色 / 浅色">
+<svg class="scheme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2m0 14.8v2.2M4.2 12H2m20 0h-2.2M6.2 6.2 4.7 4.7M19.3 19.3l-1.5-1.5m0-11.6 1.5-1.5M4.7 19.3l1.5-1.5"/></svg>
+<svg class="scheme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6.0 019.4 3.5a8.6 8.6.0 1011.1 11.1z"/></svg></button></div></header><main class=site-main><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E6%9C%AF/ style=background-color:#beefd9;color:#0f3d29>技术</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/paramiko-fabric/>自动化运维工具Paramiko & Fabric</a></h2><h3 class=article-subtitle>由于工作中经常用到这两个库，不过基本上用的fabric来实现环境部署、预检、数据上传下发等操作。因此，本文重点介绍Fabric的使用（fabric2版本）。</h3></div><footer class=article-meta><div class=inline-meta><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2022-10-30T00:00:00Z>2022 年 10 月 30 日</time>
+<svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 14 分钟</time></div></footer></div></header><aside class=article-toc><details><summary><div class=article-toc-title><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目录</span></div></summary><nav class=toc-nav id=TableOfContents><ol><li><a href=#paramiko>paramiko</a><ol><li><a href=#安装>安装</a></li><li><a href=#sshclient>SSHClient</a><ol><li><a href=#连接>连接</a></li><li><a href=#执行ssh命令>执行SSH命令</a></li><li><a href=#关闭连接>关闭连接</a></li></ol></li><li><a href=#sftpclient>SFTPClient</a><ol><li><a href=#创建sftp客户端通道>创建SFTP客户端通道</a></li><li><a href=#常用操作>常用操作</a></li><li><a href=#关闭>关闭</a></li></ol></li><li><a href=#封装>封装</a></li></ol></li><li><a href=#fabric>fabric</a><ol><li><a href=#安装-1>安装</a></li><li><a href=#使用>使用</a><ol><li><a href=#连接-1>连接</a></li><li><a href=#执行交互式命令>执行交互式命令</a></li><li><a href=#执行本地命令>执行本地命令</a></li><li><a href=#操作多台机器>操作多台机器</a></li><li><a href=#上传文件>上传文件</a></li><li><a href=#下载文件>下载文件</a></li><li><a href=#fab命令>fab命令</a></li></ol></li><li><a href=#封装-1>封装</a></li></ol></li></ol></nav></details></aside><section class=article-content><p>由于工作中经常用到这两个库，不过基本上用的fabric来实现环境部署、预检、数据上传下发等操作。因此，本文重点介绍Fabric的使用（fabric2版本）。</p><h2 id=paramiko><a href=#paramiko class=header-anchor></a>paramiko</h2><blockquote><p>paramiko是使用SSHv2协议的三方库，提供了客户端和服务端的功能。<br><a class=link href=https://docs.paramiko.org/en/stable/ target=_blank rel=noopener>Welcome to Paramiko’s documentation! — Paramiko documentation</a></p></blockquote><h3 id=安装><a href=#%e5%ae%89%e8%a3%85 class=header-anchor></a>安装</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>pip</span> <span class=n>install</span> <span class=n>paramiko</span>
+</span></span></code></pre></td></tr></table></div></div><p>paramiko中的几个重要组件：</p><blockquote><p><code>SSHClient</code>：ssh服务器会话的高级封装，封装了<code>Transport</code>, <code>Channel</code>, and <code>SFTPClient</code><br><code>SFTPClient</code>：基于一个已连通的Transport打开一个sftp会话，可实现对文件的操作（上传下载等）</p></blockquote><blockquote><p><code>Channel</code>：一种ssh传输的安全通道，类似socket<br><code>Transport</code>：一种协商加密的会话，会创建tunnels通道流，称为channels。多个channels可以在单个会话中多路复用</p></blockquote><h3 id=sshclient><a href=#sshclient class=header-anchor></a>SSHClient</h3><h4 id=连接><a href=#%e8%bf%9e%e6%8e%a5 class=header-anchor></a>连接</h4><ol><li>通过密钥连接，有两种方式：<ul><li>实例化<code>SSHClient</code></li><li>创建一个<code>Transport</code>加密通道</li></ul></li><li>通过密码连接，有两种方式：<ul><li>实例化<code>SSHClient</code></li><li>创建一个<code>Transport</code>加密通道</li></ul></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;密钥连接(通过Transport连接)&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl><span class=n>private</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>RSAKey</span><span class=o>.</span><span class=n>from_private_key_file</span><span class=p>(</span><span class=s1>&#39;/xxx/xxx&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>transport</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>Transport</span><span class=p>((</span><span class=n>host</span><span class=p>,</span> <span class=n>port</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>transport</span><span class=o>.</span><span class=n>connect</span><span class=p>(</span><span class=n>username</span><span class=o>=</span><span class=n>user</span><span class=p>,</span> <span class=n>pkey</span><span class=o>=</span><span class=n>private</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;密钥连接(通过SSHClient连接)&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl><span class=n>private</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>RSAKey</span><span class=o>.</span><span class=n>from_private_key_file</span><span class=p>(</span><span class=s1>&#39;/xxx/xxx&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>ssh_client</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>SSHClient</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>ssh_client</span><span class=o>.</span><span class=n>connect</span><span class=p>(</span><span class=n>hostname</span><span class=o>=</span><span class=n>host</span><span class=p>,</span><span class=n>port</span><span class=o>=</span><span class=mi>22</span><span class=p>,</span><span class=n>username</span><span class=o>=</span><span class=n>user</span><span class=p>,</span><span class=n>pkey</span><span class=o>=</span><span class=n>private</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;密码连接(通过Transport连接)&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl><span class=n>transport</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>Transport</span><span class=p>((</span><span class=n>host</span><span class=p>,</span> <span class=n>port</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>transport</span><span class=o>.</span><span class=n>connect</span><span class=p>(</span><span class=n>username</span><span class=o>=</span><span class=n>user</span><span class=p>,</span> <span class=n>password</span><span class=o>=</span><span class=n>password</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;密码连接(通过SSHClient连接)&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl><span class=n>ssh_client</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>SSHClient</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>ssh_client</span><span class=o>.</span><span class=n>connect</span><span class=p>(</span><span class=n>hostname</span><span class=o>=</span><span class=n>host</span><span class=p>,</span><span class=n>port</span><span class=o>=</span><span class=mi>22</span><span class=p>,</span><span class=n>username</span><span class=o>=</span><span class=n>user</span><span class=p>,</span><span class=n>password</span><span class=o>=</span><span class=n>password</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=执行ssh命令><a href=#%e6%89%a7%e8%a1%8cssh%e5%91%bd%e4%bb%a4 class=header-anchor></a>执行SSH命令</h4><p>通过<code>exec_command()</code>方法打开一个channel在服务器上执行命令，相当于我们使用ssh客户端工具执行。<br>若要执行多个命令可以通过 <code>&&</code>连接，或者for循环调用<code>exec_command()</code>，这将会打开多个channel。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>stdin</span><span class=p>,</span> <span class=n>stdout</span><span class=p>,</span> <span class=n>stderr</span> <span class=o>=</span> <span class=n>ssh_client</span><span class=o>.</span><span class=n>exec_command</span><span class=p>(</span><span class=s2>&#34;rm -i test1.txt &amp;&amp; cd /home&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>执行完成后会一次性返回stdout和stderr，同时可以通过<code>stdout.channel.recv_exit_status()</code>获取执行结果，该方法是一个阻塞方法，如果想实时获取日志输出可以封装一下，代码如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>exec_cmd</span><span class=p>(</span><span class=n>ssh_client</span><span class=p>,</span> <span class=n>commands</span><span class=p>,</span> <span class=n>f</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    :param commands: 待执行命令列表
+</span></span></span><span class=line><span class=cl><span class=s2>    :param f: 文件对象
+</span></span></span><span class=line><span class=cl><span class=s2>    :return: 执行状态
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>status</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>cmd</span> <span class=ow>in</span> <span class=n>commands</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>stdin</span><span class=p>,</span> <span class=n>stdout</span><span class=p>,</span> <span class=n>stderr</span> <span class=o>=</span> <span class=n>ssh_client</span><span class=o>.</span><span class=n>exec_command</span><span class=p>(</span><span class=n>cmd</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>f</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;start run command: </span><span class=si>{</span><span class=n>cmd</span><span class=si>}</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=kc>True</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>err</span><span class=p>,</span> <span class=n>out</span> <span class=o>=</span> <span class=n>stderr</span><span class=o>.</span><span class=n>readline</span><span class=p>()</span><span class=o>.</span><span class=n>strip</span><span class=p>(),</span> <span class=n>stdout</span><span class=o>.</span><span class=n>readline</span><span class=p>()</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>out</span> <span class=ow>or</span> <span class=n>err</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                <span class=k>break</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>out</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>f</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>out</span> <span class=o>+</span> <span class=s2>&#34;</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>err</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>f</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>err</span> <span class=o>+</span> <span class=s2>&#34;</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>status</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>stdout</span><span class=o>.</span><span class=n>channel</span><span class=o>.</span><span class=n>recv_exit_status</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>status</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=关闭连接><a href=#%e5%85%b3%e9%97%ad%e8%bf%9e%e6%8e%a5 class=header-anchor></a>关闭连接</h4><p><code>ssh_client.close()</code><br><code>transport.close()</code></p><h3 id=sftpclient><a href=#sftpclient class=header-anchor></a>SFTPClient</h3><h4 id=创建sftp客户端通道><a href=#%e5%88%9b%e5%bb%basftp%e5%ae%a2%e6%88%b7%e7%ab%af%e9%80%9a%e9%81%93 class=header-anchor></a>创建SFTP客户端通道</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>transport</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>Transport</span><span class=p>((</span><span class=n>host</span><span class=p>,</span> <span class=n>port</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>transport</span><span class=o>.</span><span class=n>connect</span><span class=p>(</span><span class=n>username</span><span class=o>=</span><span class=n>user</span><span class=p>,</span> <span class=n>password</span><span class=o>=</span><span class=n>password</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># 基于已连通的transport创建一个SFTP客户端channel</span>
+</span></span><span class=line><span class=cl><span class=c1># sftp = paramiko.SFTPClient.from_transport(transport)</span>
+</span></span><span class=line><span class=cl><span class=n>sftp</span> <span class=o>=</span> <span class=n>transport</span><span class=o>.</span><span class=n>open_sftp_client</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 或者通过SSHClient创建</span>
+</span></span><span class=line><span class=cl><span class=n>ssh_client</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>SSHClient</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>ssh_client</span><span class=o>.</span><span class=n>_transport</span> <span class=o>=</span> <span class=n>transport</span>
+</span></span><span class=line><span class=cl><span class=n>sftp</span> <span class=o>=</span> <span class=n>ssh_client</span><span class=o>.</span><span class=n>open_sftp</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=常用操作><a href=#%e5%b8%b8%e7%94%a8%e6%93%8d%e4%bd%9c class=header-anchor></a>常用操作</h4><p><code>listdir(path)</code>：遍历远程路径下的文件目录（只能遍历一级目录和文件）<br><code>listdir_attr(path)</code>：遍历远程路径下的文件目录，并且可以获取每个文件的详细属性<br><code>remove(path)</code>：删除文件<br><code>rmdir(path)</code>：删除目录<br><code>mkdir(path)</code>：创建目录<br><code>stat(path)</code>：获取文件属性信息（若为软链接文件，获取的是指向的源文件）<br><code>lstat(path)</code>：获取文件属性信息（若为软链接文件，获取的是自身文件）<br><code>get(remotepath, localpath)</code>：下载<br><code>put(localpath, remotepath)</code>：上传</p><p><strong>检查远程文件是否存在</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>normpath</span><span class=p>(</span><span class=n>path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    由于windows和linux操作系统不同，路径格式会出现不统一的情况，反斜杠不处理的话会出现很多问题
+</span></span></span><span class=line><span class=cl><span class=s2>    替换windows路径中的</span><span class=se>\
+</span></span></span><span class=line><span class=cl><span class=s2>    :param path:
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=n>Path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>path</span> <span class=o>=</span> <span class=nb>str</span><span class=p>(</span><span class=n>path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>path</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s1>&#39;</span><span class=se>\\</span><span class=s1>&#39;</span><span class=p>,</span> <span class=s1>&#39;/&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>check_remote_path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>False</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    判断目标机器路径是否存在
+</span></span></span><span class=line><span class=cl><span class=s2>    :param remote_path:
+</span></span></span><span class=line><span class=cl><span class=s2>    :param is_mkdir: 若为True，则会创建此路径
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>remote_path</span> <span class=o>=</span> <span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>sftp</span><span class=o>.</span><span class=n>lstat</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>FileNotFoundError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>is_mkdir</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>sftp</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=kc>False</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>判断远程路径是否为目录</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>remote_path_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    检查一个远程路径是否为目录
+</span></span></span><span class=line><span class=cl><span class=s2>    :param remote_path:
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>attr</span> <span class=o>=</span> <span class=n>sftp</span><span class=o>.</span><span class=n>lstat</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>stat</span><span class=o>.</span><span class=n>S_ISDIR</span><span class=p>(</span><span class=n>attr</span><span class=o>.</span><span class=n>st_mode</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>上传</strong></p><p>注意：远程目录必须存在，否则会报错</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>get</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    下载文件或目录
+</span></span></span><span class=line><span class=cl><span class=s2>    :param remote_path: 目标机器路径（注意路径反斜杠问题会报错）
+</span></span></span><span class=line><span class=cl><span class=s2>    :param local_path:  本地路径
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 判断远程路径是否存在</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=ow>not</span> <span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>False</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span> <span class=o>=</span> <span class=n>Path</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>Path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>find_files</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>sftp_attr</span> <span class=ow>in</span> <span class=n>sftp</span><span class=o>.</span><span class=n>listdir_attr</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)):</span>
+</span></span><span class=line><span class=cl>            <span class=n>filename</span> <span class=o>=</span> <span class=n>sftp_attr</span><span class=o>.</span><span class=n>filename</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>filename</span><span class=o>.</span><span class=n>startswith</span><span class=p>(</span><span class=s1>&#39;.&#39;</span><span class=p>):</span>    <span class=c1># 过滤隐藏文件</span>
+</span></span><span class=line><span class=cl>                <span class=k>continue</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>local_dir</span><span class=p>,</span> <span class=n>remote_dir</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>filename</span><span class=p>),</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>filename</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 若为目录，则递归调用</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>stat</span><span class=o>.</span><span class=n>S_ISDIR</span><span class=p>(</span><span class=n>sftp_attr</span><span class=o>.</span><span class=n>st_mode</span><span class=p>):</span>     <span class=c1># st_mode判断文件类型（目录还是文件）</span>
+</span></span><span class=line><span class=cl>                <span class=n>local_dir</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>parents</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>  <span class=c1># parents为True支持多级创建，exist_ok 存在就不创建</span>
+</span></span><span class=line><span class=cl>                <span class=n>find_files</span><span class=p>(</span><span class=n>remote_dir</span><span class=p>,</span> <span class=n>local_dir</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>local_dir</span><span class=o>.</span><span class=n>parent</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>parents</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=n>sftp</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_dir</span><span class=p>),</span> <span class=n>normpath</span><span class=p>(</span><span class=n>local_dir</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                
+</span></span><span class=line><span class=cl>    <span class=c1># 下载目录</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>remote_path_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>find_files</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 下载单个文件，如果没有设置本地文件名，默认为远程路径中的名字</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>local_path</span><span class=o>.</span><span class=n>is_dir</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>            <span class=n>local_path</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>parents</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>local_path</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>remote_path</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>local_path</span><span class=o>.</span><span class=n>parent</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>parents</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>sftp</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>),</span> <span class=n>normpath</span><span class=p>(</span><span class=n>local_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=kc>True</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>下载</strong></p><p>注意：本地目录必须存在，否则会报错</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>put</span><span class=p>(</span><span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span> <span class=o>=</span> <span class=n>Path</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>Path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>local_path</span><span class=o>.</span><span class=n>is_dir</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>path</span> <span class=ow>in</span> <span class=n>local_path</span><span class=o>.</span><span class=n>rglob</span><span class=p>(</span><span class=s1>&#39;[!.]*&#39;</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 拼接远程路径，relative_to获取相对路径</span>
+</span></span><span class=line><span class=cl>            <span class=n>remote</span> <span class=o>=</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>path</span><span class=o>.</span><span class=n>relative_to</span><span class=p>(</span><span class=n>local_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>path</span><span class=o>.</span><span class=n>is_file</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                <span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote</span><span class=o>.</span><span class=n>parent</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>   <span class=c1># 目标机器上不存在此路径需要创建</span>
+</span></span><span class=line><span class=cl>                <span class=n>sftp</span><span class=o>.</span><span class=n>put</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>path</span><span class=p>),</span> <span class=n>normpath</span><span class=p>(</span><span class=n>remote</span><span class=p>))</span>   
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 上传单个文件</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote_path</span><span class=o>.</span><span class=n>parent</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>remote_path_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>     <span class=c1># 若远程路径是一个目录，就将本地文件名作为默认名字</span>
+</span></span><span class=line><span class=cl>            <span class=n>remote_path</span> <span class=o>=</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>local_path</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>sftp</span><span class=o>.</span><span class=n>put</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl> 
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=kc>True</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=关闭><a href=#%e5%85%b3%e9%97%ad class=header-anchor></a>关闭</h4><p><code>sftp.close()</code></p><h3 id=封装><a href=#%e5%b0%81%e8%a3%85 class=header-anchor></a>封装</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span><span class=lnt>171
+</span><span class=lnt>172
+</span><span class=lnt>173
+</span><span class=lnt>174
+</span><span class=lnt>175
+</span><span class=lnt>176
+</span><span class=lnt>177
+</span><span class=lnt>178
+</span><span class=lnt>179
+</span><span class=lnt>180
+</span><span class=lnt>181
+</span><span class=lnt>182
+</span><span class=lnt>183
+</span><span class=lnt>184
+</span><span class=lnt>185
+</span><span class=lnt>186
+</span><span class=lnt>187
+</span><span class=lnt>188
+</span><span class=lnt>189
+</span><span class=lnt>190
+</span><span class=lnt>191
+</span><span class=lnt>192
+</span><span class=lnt>193
+</span><span class=lnt>194
+</span><span class=lnt>195
+</span><span class=lnt>196
+</span><span class=lnt>197
+</span><span class=lnt>198
+</span><span class=lnt>199
+</span><span class=lnt>200
+</span><span class=lnt>201
+</span><span class=lnt>202
+</span><span class=lnt>203
+</span><span class=lnt>204
+</span><span class=lnt>205
+</span><span class=lnt>206
+</span><span class=lnt>207
+</span><span class=lnt>208
+</span><span class=lnt>209
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>SSHConnection</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>host</span><span class=p>,</span> <span class=n>user</span><span class=p>,</span> <span class=n>password</span><span class=p>,</span> <span class=n>port</span><span class=o>=</span><span class=mi>22</span><span class=p>,</span> <span class=n>mylogger</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_host</span> <span class=o>=</span> <span class=n>host</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_user</span> <span class=o>=</span> <span class=n>user</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_password</span> <span class=o>=</span> <span class=n>password</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_port</span> <span class=o>=</span> <span class=n>port</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_transport</span> <span class=o>=</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span> <span class=o>=</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_client</span> <span class=o>=</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span> <span class=o>=</span> <span class=n>mylogger</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>connect</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>connect</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 密钥方式</span>
+</span></span><span class=line><span class=cl>        <span class=c1># private = paramiko.RSAKey.from_private_key_file(&#39;/xxx/xxx&#39;)</span>
+</span></span><span class=line><span class=cl>        <span class=c1># transport = paramiko.Transport((self._host, self._port))</span>
+</span></span><span class=line><span class=cl>        <span class=c1># transport.connect(username=self._user, pkey=private)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1># 密码连接方式(通过Transport连接，或者通过SSHClient连接)</span>
+</span></span><span class=line><span class=cl>        <span class=c1># transport 一种加密的会话，会创建一个加密通道</span>
+</span></span><span class=line><span class=cl>        <span class=n>transport</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>Transport</span><span class=p>((</span><span class=bp>self</span><span class=o>.</span><span class=n>_host</span><span class=p>,</span> <span class=bp>self</span><span class=o>.</span><span class=n>_port</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=n>transport</span><span class=o>.</span><span class=n>connect</span><span class=p>(</span><span class=n>username</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>_user</span><span class=p>,</span> <span class=n>password</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>_password</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_transport</span> <span class=o>=</span> <span class=n>transport</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>exec_cmd</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>commands</span><span class=p>:</span> <span class=nb>list</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>List</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        :param commands: 待执行命令，支持list
+</span></span></span><span class=line><span class=cl><span class=s2>        :return: 执行状态
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 实例化SSHClient</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=ow>not</span> <span class=bp>self</span><span class=o>.</span><span class=n>_client</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_client</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>SSHClient</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_client</span><span class=o>.</span><span class=n>_transport</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_transport</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>status</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>cmd</span> <span class=ow>in</span> <span class=n>commands</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>stdin</span><span class=p>,</span> <span class=n>stdout</span><span class=p>,</span> <span class=n>stderr</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_client</span><span class=o>.</span><span class=n>exec_command</span><span class=p>(</span><span class=n>cmd</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;start run command: </span><span class=si>{</span><span class=n>cmd</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>while</span> <span class=kc>True</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>err</span><span class=p>,</span> <span class=n>out</span> <span class=o>=</span> <span class=n>stderr</span><span class=o>.</span><span class=n>readline</span><span class=p>()</span><span class=o>.</span><span class=n>strip</span><span class=p>(),</span> <span class=n>stdout</span><span class=o>.</span><span class=n>readline</span><span class=p>()</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>out</span> <span class=ow>or</span> <span class=n>err</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                    <span class=k>break</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=n>out</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=n>out</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=n>err</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=n>err</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s1>&#39;error&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>status</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>stdout</span><span class=o>.</span><span class=n>channel</span><span class=o>.</span><span class=n>recv_exit_status</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>status</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>remote_path_isdir</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        检查一个远程路径是否为目录
+</span></span></span><span class=line><span class=cl><span class=s2>        :param remote_path:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>attr</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>lstat</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>stat</span><span class=o>.</span><span class=n>S_ISDIR</span><span class=p>(</span><span class=n>attr</span><span class=o>.</span><span class=n>st_mode</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>check_remote_path</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>False</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        判断目标机器路径是否存在
+</span></span></span><span class=line><span class=cl><span class=s2>        :param remote_path:
+</span></span></span><span class=line><span class=cl><span class=s2>        :param is_mkdir: 若为True，则会创建此路径
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>remote_path</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>lstat</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>FileNotFoundError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>is_mkdir</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=kc>False</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@staticmethod</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>check_local_path</span><span class=p>(</span><span class=n>local_path</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>True</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        判断本地路径是否存在
+</span></span></span><span class=line><span class=cl><span class=s2>        :param local_path:
+</span></span></span><span class=line><span class=cl><span class=s2>        :param is_mkdir:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>local_path</span><span class=p>,</span> <span class=n>Path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>local_path</span> <span class=o>=</span> <span class=nb>str</span><span class=p>(</span><span class=n>local_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=ow>not</span> <span class=n>os</span><span class=o>.</span><span class=n>path</span><span class=o>.</span><span class=n>exists</span><span class=p>(</span><span class=n>local_path</span><span class=p>)</span> <span class=ow>and</span> <span class=n>is_mkdir</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>os</span><span class=o>.</span><span class=n>makedirs</span><span class=p>(</span><span class=n>local_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>writer</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>message</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        自定义写入文件方法，同时支持logger或文件对象
+</span></span></span><span class=line><span class=cl><span class=s2>        :param message:
+</span></span></span><span class=line><span class=cl><span class=s2>        :param level:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=p>,</span> <span class=n>logging</span><span class=o>.</span><span class=n>Logger</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=ow>not</span> <span class=n>level</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>elif</span> <span class=n>level</span> <span class=o>==</span> <span class=s1>&#39;error&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>message</span><span class=o>+</span><span class=s2>&#34;</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=n>message</span><span class=o>+</span><span class=s2>&#34;</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>get</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        下载文件或目录
+</span></span></span><span class=line><span class=cl><span class=s2>        :param remote_path: 目标机器路径（注意路径反斜杠问题会报错）
+</span></span></span><span class=line><span class=cl><span class=s2>        :param local_path:  本地路径
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=ow>not</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 创建一个已连通的sftp client</span>
+</span></span><span class=line><span class=cl>            <span class=c1># self._sftp = paramiko.SFTPClient.from_transport(self._transport)</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_transport</span><span class=o>.</span><span class=n>open_sftp_client</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=ow>not</span> <span class=bp>self</span><span class=o>.</span><span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;路径不存在：</span><span class=si>{</span><span class=n>remote_path</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s1>&#39;error&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=kc>False</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span> <span class=o>=</span> <span class=n>Path</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>Path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>def</span> <span class=nf>find_files</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>sftp_attr</span> <span class=ow>in</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>listdir_attr</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)):</span>
+</span></span><span class=line><span class=cl>                <span class=n>filename</span> <span class=o>=</span> <span class=n>sftp_attr</span><span class=o>.</span><span class=n>filename</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=n>filename</span><span class=o>.</span><span class=n>startswith</span><span class=p>(</span><span class=s1>&#39;.&#39;</span><span class=p>):</span>    <span class=c1># 过滤隐藏文件</span>
+</span></span><span class=line><span class=cl>                    <span class=k>continue</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                <span class=n>local_dir</span><span class=p>,</span> <span class=n>remote_dir</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>filename</span><span class=p>),</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>filename</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                <span class=c1># 若为目录，则递归调用</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=n>stat</span><span class=o>.</span><span class=n>S_ISDIR</span><span class=p>(</span><span class=n>sftp_attr</span><span class=o>.</span><span class=n>st_mode</span><span class=p>):</span>     <span class=c1># st_mode判断文件类型（目录还是文件）</span>
+</span></span><span class=line><span class=cl>                    <span class=n>local_dir</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>parents</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>  <span class=c1># parents为True支持多级创建，exist_ok 存在就不创建</span>
+</span></span><span class=line><span class=cl>                    <span class=n>find_files</span><span class=p>(</span><span class=n>remote_dir</span><span class=p>,</span> <span class=n>local_dir</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=n>local_dir</span><span class=o>.</span><span class=n>parent</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>parents</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_dir</span><span class=p>),</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>local_dir</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;download file </span><span class=si>{</span><span class=n>remote_dir</span><span class=si>}</span><span class=s2> -&gt; </span><span class=si>{</span><span class=n>local_dir</span><span class=si>}</span><span class=s2> successful!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1># 下载目录</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>remote_path_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>find_files</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1># 下载单个文件，如果没有设置本地文件名，默认为远程路径中的名字</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>local_path</span><span class=o>.</span><span class=n>is_dir</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                <span class=n>local_path</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>parents</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=n>local_path</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>remote_path</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>local_path</span><span class=o>.</span><span class=n>parent</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>parents</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>exist_ok</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>),</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>local_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;download file </span><span class=si>{</span><span class=n>remote_path</span><span class=si>}</span><span class=s2> -&gt; </span><span class=si>{</span><span class=n>local_path</span><span class=si>}</span><span class=s2> successful!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>put</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=ow>not</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span> <span class=o>=</span> <span class=n>paramiko</span><span class=o>.</span><span class=n>SFTPClient</span><span class=o>.</span><span class=n>from_transport</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>_transport</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span> <span class=o>=</span> <span class=n>Path</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>Path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>local_path</span><span class=o>.</span><span class=n>is_dir</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>path</span> <span class=ow>in</span> <span class=n>local_path</span><span class=o>.</span><span class=n>rglob</span><span class=p>(</span><span class=s1>&#39;[!.]*&#39;</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                <span class=c1># 拼接远程路径，relative_to获取相对路径</span>
+</span></span><span class=line><span class=cl>                <span class=n>remote</span> <span class=o>=</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>path</span><span class=o>.</span><span class=n>relative_to</span><span class=p>(</span><span class=n>local_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=n>path</span><span class=o>.</span><span class=n>is_file</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote</span><span class=o>.</span><span class=n>parent</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>   <span class=c1># 目标机器上不存在此路径需要创建</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>put</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>path</span><span class=p>),</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;upload the file </span><span class=si>{</span><span class=n>path</span><span class=si>}</span><span class=s2> successful!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1># 上传单个文件</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote_path</span><span class=o>.</span><span class=n>parent</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>remote_path_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>     <span class=c1># 若远程路径是一个目录，就将本地文件名作为默认名字</span>
+</span></span><span class=line><span class=cl>                <span class=n>remote_path</span> <span class=o>=</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>local_path</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>put</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;upload the file </span><span class=si>{</span><span class=n>local_path</span><span class=si>}</span><span class=s2> successful!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>close</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>_client</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_client</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>_transport</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_transport</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_client</span><span class=p>,</span> <span class=bp>self</span><span class=o>.</span><span class=n>_transport</span><span class=p>,</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span> <span class=o>=</span> <span class=kc>None</span><span class=p>,</span>  <span class=kc>None</span><span class=p>,</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@staticmethod</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>normpath</span><span class=p>(</span><span class=n>path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        由于windows和linux操作系统不同，路径格式会出现不统一的情况，反斜杠不处理的话会出现很多问题
+</span></span></span><span class=line><span class=cl><span class=s2>        替换windows路径中的</span><span class=se>\
+</span></span></span><span class=line><span class=cl><span class=s2>        :param path:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=n>Path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>path</span> <span class=o>=</span> <span class=nb>str</span><span class=p>(</span><span class=n>path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>path</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s1>&#39;</span><span class=se>\\</span><span class=s1>&#39;</span><span class=p>,</span> <span class=s1>&#39;/&#39;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=fabric><a href=#fabric class=header-anchor></a>fabric</h2><blockquote><p>fabric是基于paramiko的进一步封装，使用起来更加方便。fabric共有三个版本：fabric1、fabric2、fabric3，其中fabric3是非官方版本，所以不推荐使用，建议使用fabric2版本。<br>官方文档：https://www.fabfile.org/</p></blockquote><h3 id=安装-1><a href=#%e5%ae%89%e8%a3%85-1 class=header-anchor></a>安装</h3><p><code>pip install fabric</code>或者<code>pip install fabric2</code>，都是安装最新的官方版本。</p><h3 id=使用><a href=#%e4%bd%bf%e7%94%a8 class=header-anchor></a>使用</h3><h4 id=连接-1><a href=#%e8%bf%9e%e6%8e%a5-1 class=header-anchor></a>连接</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>fabric</span> <span class=kn>import</span> <span class=n>Connection</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>conn</span> <span class=o>=</span> <span class=n>Connection</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>user</span><span class=si>}</span><span class=s2>@</span><span class=si>{</span><span class=n>host</span><span class=si>}</span><span class=s2>:</span><span class=si>{</span><span class=n>port</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=n>connect_kwargs</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;password&#34;</span><span class=p>:</span> <span class=n>password</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>                    <span class=n>connect_timeout</span><span class=o>=</span><span class=mi>5</span><span class=p>,</span>  <span class=c1># 5s超时</span>
+</span></span><span class=line><span class=cl>                  <span class=p>)</span>
+</span></span><span class=line><span class=cl>                  
+</span></span><span class=line><span class=cl><span class=c1># 多个命令之间用&amp;&amp;或;连接</span>
+</span></span><span class=line><span class=cl><span class=n>conn</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=s2>&#34;ls&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>关于<code>run()</code>方法的参数说明：</p><div class=table-wrapper><table><thead><tr><th>参数</th><th>解释</th></tr></thead><tbody><tr><td>hide=True</td><td>服务器的输出信息不会在控制台打印</td></tr><tr><td>warn=True</td><td>忽略异常信息（即exit code不等于0的命令），会将异常信息输出到stderr，若设置False则会报SystemExit异常，之前在测试环境就是因为没有处理这个SystemExit异常（SystemExit和Exception是同级关系），导致整个进程崩溃</td></tr><tr><td>pty=True</td><td>交互式伪终端时使用，其他不建议使用</td></tr><tr><td>watchers</td><td>监听Responder列表，自动响应</td></tr><tr><td>out_stream</td><td>文件对象，可以记录命令输出信息（fabric1版本的参数好像是stdout）</td></tr><tr><td>err_stream</td><td>文件对象，可以记录命令错误输出信息</td></tr></tbody></table></div><p><code>ret = run()</code>方法返回值：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>ret</span><span class=o>.</span><span class=n>stdout</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span>  <span class=c1># 正常输出</span>
+</span></span><span class=line><span class=cl><span class=n>ret</span><span class=o>.</span><span class=n>stderr</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span>  <span class=c1># 异常输出</span>
+</span></span><span class=line><span class=cl><span class=n>ret</span><span class=o>.</span><span class=n>failed</span>  <span class=c1># 执行状态True or False</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=执行交互式命令><a href=#%e6%89%a7%e8%a1%8c%e4%ba%a4%e4%ba%92%e5%bc%8f%e5%91%bd%e4%bb%a4 class=header-anchor></a>执行交互式命令</h4><p>如果需要用户主动输入命令，可以使用Responder，第一个参数为需要匹配的字符串，第二个参数为响应的内容。由于交互式终端原因，此处需要设置<code>pty=True</code>，否则运行会提示：<code>no tty present and no askpass program specified</code>，若提示<code>xx user is not in the sudoers file. This incident will be reported</code>，需要通过登录root用户，修改sudoers文件。</p><p>特别注意：模式匹配字符串要转义，否则会匹配不到，进而一直阻塞无响应（凡是需要用户介入的操作，都会一直卡在那里直到给出响应）；response内容必须以<code>\n</code>紧接结尾，相当于输入完成后执行回车操作。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>invoke</span> <span class=kn>import</span> <span class=n>Responder</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>fabric</span> <span class=kn>import</span> <span class=n>Connection</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>sudopass</span> <span class=o>=</span> <span class=n>Responder</span><span class=p>(</span><span class=n>pattern</span><span class=o>=</span><span class=sa>fr</span><span class=s1>&#39;\[sudo\] password for </span><span class=si>{</span><span class=n>user</span><span class=si>}</span><span class=s1>:&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                     <span class=n>response</span><span class=o>=</span><span class=sa>f</span><span class=s1>&#39;</span><span class=si>{</span><span class=n>password</span><span class=si>}</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>,)</span>
+</span></span><span class=line><span class=cl><span class=n>conn</span> <span class=o>=</span> <span class=n>Connection</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>user</span><span class=si>}</span><span class=s2>@</span><span class=si>{</span><span class=n>host</span><span class=si>}</span><span class=s2>:</span><span class=si>{</span><span class=n>port</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>connect_kwargs</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;password&#34;</span><span class=p>:</span> <span class=n>password</span><span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=c1># 如果要监听多个，则放入列表中传递给watchers</span>
+</span></span><span class=line><span class=cl><span class=n>conn</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=s2>&#34;sudo whoami&#34;</span><span class=p>,</span> <span class=n>pty</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>watchers</span><span class=o>=</span><span class=p>[</span><span class=n>sudopass</span><span class=p>])</span>
+</span></span></code></pre></td></tr></table></div></div><p>with用法：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 执行完自动关闭</span>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=n>Connection</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>user</span><span class=si>}</span><span class=s2>@</span><span class=si>{</span><span class=n>host</span><span class=si>}</span><span class=s2>:</span><span class=si>{</span><span class=n>port</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>connect_kwargs</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;password&#34;</span><span class=p>:</span> <span class=n>password</span><span class=p>})</span> <span class=k>as</span> <span class=n>c</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>c</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=s2>&#34;cd /home&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl><span class=c1># with cd: 退出with上下文之后会回到当前登录用户的家目录</span>
+</span></span><span class=line><span class=cl><span class=n>conn</span> <span class=o>=</span> <span class=n>Connection</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>user</span><span class=si>}</span><span class=s2>@</span><span class=si>{</span><span class=n>host</span><span class=si>}</span><span class=s2>:</span><span class=si>{</span><span class=n>port</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>connect_kwargs</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;password&#34;</span><span class=p>:</span> <span class=n>password</span><span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=n>conn</span><span class=o>.</span><span class=n>cd</span><span class=p>(</span><span class=s2>&#34;/home/yuqiuwen/PythonProjects/zhongxin/&#34;</span><span class=p>):</span> 
+</span></span><span class=line><span class=cl>    <span class=c1># 以下操作均在当前目录下执行</span>
+</span></span><span class=line><span class=cl>    <span class=o>...</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl><span class=c1># with settings在fabric2中遗弃了</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=执行本地命令><a href=#%e6%89%a7%e8%a1%8c%e6%9c%ac%e5%9c%b0%e5%91%bd%e4%bb%a4 class=header-anchor></a>执行本地命令</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># Connection.local方法(实际上是invoke.run的装饰器)</span>
+</span></span><span class=line><span class=cl><span class=n>conn</span><span class=o>.</span><span class=n>local</span><span class=p>(</span><span class=s2>&#34;dir&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 或者invoke.run</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>invoke</span> <span class=kn>import</span> <span class=n>run</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=操作多台机器><a href=#%e6%93%8d%e4%bd%9c%e5%a4%9a%e5%8f%b0%e6%9c%ba%e5%99%a8 class=header-anchor></a>操作多台机器</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>fabric</span> <span class=kn>import</span> <span class=n>SerialGroup</span> <span class=k>as</span> <span class=n>Group</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>results</span> <span class=o>=</span> <span class=n>Group</span><span class=p>(</span><span class=s1>&#39;web1&#39;</span><span class=p>,</span> <span class=s1>&#39;web2&#39;</span><span class=p>,</span> <span class=s1>&#39;mac1&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=s1>&#39;uname -s&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>results</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>&lt;</span><span class=n>GroupResult</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=o>&lt;</span><span class=n>Connection</span> <span class=s1>&#39;web1&#39;</span><span class=o>&gt;</span><span class=p>:</span> <span class=o>&lt;</span><span class=n>CommandResult</span> <span class=s1>&#39;uname -s&#39;</span><span class=o>&gt;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=o>&lt;</span><span class=n>Connection</span> <span class=s1>&#39;web2&#39;</span><span class=o>&gt;</span><span class=p>:</span> <span class=o>&lt;</span><span class=n>CommandResult</span> <span class=s1>&#39;uname -s&#39;</span><span class=o>&gt;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=o>&lt;</span><span class=n>Connection</span> <span class=s1>&#39;mac1&#39;</span><span class=o>&gt;</span><span class=p>:</span> <span class=o>&lt;</span><span class=n>CommandResult</span> <span class=s1>&#39;uname -s&#39;</span><span class=o>&gt;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>}</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>connection</span><span class=p>,</span> <span class=n>result</span> <span class=ow>in</span> <span class=n>results</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>     <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;</span><span class=si>{0.host}</span><span class=s2>: </span><span class=si>{1.stdout}</span><span class=s2>&#34;</span><span class=o>.</span><span class=n>format</span><span class=p>(</span><span class=n>connection</span><span class=p>,</span> <span class=n>result</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>web1</span><span class=p>:</span> <span class=n>Linux</span>
+</span></span><span class=line><span class=cl><span class=n>web2</span><span class=p>:</span> <span class=n>Linux</span>
+</span></span><span class=line><span class=cl><span class=n>mac1</span><span class=p>:</span> <span class=n>Darwin</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>fabric</span> <span class=kn>import</span> <span class=n>SerialGroup</span> <span class=k>as</span> <span class=n>Group</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 当目标机器文件不存在时执行上传和解压缩操作</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>upload_and_unpack</span><span class=p>(</span><span class=n>c</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>c</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=s1>&#39;test -f /opt/mydata/myfile&#39;</span><span class=p>,</span> <span class=n>warn</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span><span class=o>.</span><span class=n>failed</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>c</span><span class=o>.</span><span class=n>put</span><span class=p>(</span><span class=s1>&#39;myfiles.tgz&#39;</span><span class=p>,</span> <span class=s1>&#39;/opt/mydata&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>c</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=s1>&#39;tar -C /opt/mydata -xzvf /opt/mydata/myfiles.tgz&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 如果用户名不同的话可以用这种方式：</span>
+</span></span><span class=line><span class=cl><span class=c1># Group(&#39;user@host1&#39;, &#39;user2@host2&#39;, &#39;user3@host3&#39;, connect_kwargs={&#39;password&#39;: &#39;123456&#39;})</span>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>connection</span> <span class=ow>in</span> <span class=n>Group</span><span class=p>(</span><span class=s1>&#39;host1&#39;</span><span class=p>,</span> <span class=s1>&#39;host2&#39;</span><span class=p>,</span> <span class=s1>&#39;host3&#39;</span><span class=p>,</span> <span class=n>user</span><span class=o>=</span><span class=s1>&#39;root&#39;</span><span class=p>,</span> <span class=n>connect_kwargs</span><span class=o>=</span><span class=p>{</span><span class=s1>&#39;password&#39;</span><span class=p>:</span> <span class=s1>&#39;123456&#39;</span><span class=p>}):</span>
+</span></span><span class=line><span class=cl>    <span class=n>upload_and_unpack</span><span class=p>(</span><span class=n>connection</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=上传文件><a href=#%e4%b8%8a%e4%bc%a0%e6%96%87%e4%bb%b6 class=header-anchor></a>上传文件</h4><p>fabric只能上传单个文件，如果想上传多个文件，有两种方案：本地打包之后上传，然后在远程服务器执行解压操作，或者通过遍历文件夹循环调用get上传，本地目录遍历用到了<code>pathlib2.Path</code>中的<code>rglob</code>方法。注意：远程路径如果不存在会报错。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>conn</span> <span class=o>=</span> <span class=n>Connection</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>user</span><span class=si>}</span><span class=s2>@</span><span class=si>{</span><span class=n>host</span><span class=si>}</span><span class=s2>:</span><span class=si>{</span><span class=n>port</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>connect_kwargs</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;password&#34;</span><span class=p>:</span> <span class=n>password</span><span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=n>sftp</span> <span class=o>=</span> <span class=n>conn</span><span class=o>.</span><span class=n>sftp</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>put</span><span class=p>(</span><span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span> <span class=o>=</span> <span class=n>Path</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>Path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>local_path</span><span class=o>.</span><span class=n>is_dir</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>path</span> <span class=ow>in</span> <span class=n>local_path</span><span class=o>.</span><span class=n>rglob</span><span class=p>(</span><span class=s1>&#39;[!.]*&#39;</span><span class=p>):</span>  <span class=c1># 过滤掉以点开头的文件</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 拼接远程路径，relative_to获取相对路径</span>
+</span></span><span class=line><span class=cl>            <span class=n>remote</span> <span class=o>=</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>path</span><span class=o>.</span><span class=n>relative_to</span><span class=p>(</span><span class=n>local_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>path</span><span class=o>.</span><span class=n>is_file</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                <span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote</span><span class=o>.</span><span class=n>parent</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>  <span class=c1># 目标机器上不存在此路径需要创建</span>
+</span></span><span class=line><span class=cl>                <span class=n>conn</span><span class=o>.</span><span class=n>put</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>path</span><span class=p>),</span> <span class=n>normpath</span><span class=p>(</span><span class=n>remote</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 上传单个文件</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote_path</span><span class=o>.</span><span class=n>parent</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>remote_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>  <span class=c1># 若远程路径是一个目录，就将本地文件名作为默认名字</span>
+</span></span><span class=line><span class=cl>            <span class=n>remote_path</span> <span class=o>=</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>local_path</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>conn</span><span class=o>.</span><span class=n>put</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>check_remote_path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>False</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    判断目标机器路径是否存在
+</span></span></span><span class=line><span class=cl><span class=s2>    :param remote_path:
+</span></span></span><span class=line><span class=cl><span class=s2>    :param is_mkdir: 若为True，则会创建此路径
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>remote_path</span> <span class=o>=</span> <span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>sftp</span><span class=o>.</span><span class=n>lstat</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>FileNotFoundError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>is_mkdir</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>sftp</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>except</span> <span class=ne>PermissionError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>ret</span> <span class=o>=</span> <span class=n>conn</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;sudo mkdir </span><span class=si>{</span><span class=n>remote_path</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>pty</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>watchers</span><span class=o>=</span><span class=p>[</span><span class=n>sudopass</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=ow>not</span> <span class=n>ret</span><span class=o>.</span><span class=n>failed</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=kc>False</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=下载文件><a href=#%e4%b8%8b%e8%bd%bd%e6%96%87%e4%bb%b6 class=header-anchor></a>下载文件</h4><p>fabric下载文件的方法和paramiko有略微细节差异，fabric下载文件时若本地路径不存在会自动创建，并且本地路径如果没提供文件名，会以远程文件名作为默认值，但前提是本地路径以<code>/</code>结尾，如果没有<code>/</code>，将以路径最后一部分作为文件名。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>traverse_remote_files</span><span class=p>(</span><span class=n>remote_path</span><span class=p>:</span> <span class=n>Path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>:</span> <span class=n>Path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>files_attr</span> <span class=o>=</span> <span class=n>sftp</span><span class=o>.</span><span class=n>listdir_attr</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>file_attr</span> <span class=ow>in</span> <span class=n>files_attr</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>filename</span> <span class=o>=</span> <span class=n>file_attr</span><span class=o>.</span><span class=n>filename</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>filename</span><span class=o>.</span><span class=n>startswith</span><span class=p>(</span><span class=s1>&#39;.&#39;</span><span class=p>):</span>  <span class=c1># 过滤以点开头的目录或文件</span>
+</span></span><span class=line><span class=cl>            <span class=k>continue</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 此处的local和remote可能为目录，也可能为文件</span>
+</span></span><span class=line><span class=cl>        <span class=n>local</span><span class=p>,</span> <span class=n>remote</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>filename</span><span class=p>),</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>filename</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 若为目录，则递归调用</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>stat</span><span class=o>.</span><span class=n>S_ISDIR</span><span class=p>(</span><span class=n>file_attr</span><span class=o>.</span><span class=n>st_mode</span><span class=p>):</span>  <span class=c1># st_mode判断文件类型（目录还是文件）</span>
+</span></span><span class=line><span class=cl>            <span class=k>yield from</span> <span class=n>traverse_remote_files</span><span class=p>(</span><span class=n>remote</span><span class=p>,</span> <span class=n>local</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>yield</span> <span class=n>remote</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>remote_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    检查一个远程路径是否为目录
+</span></span></span><span class=line><span class=cl><span class=s2>    :param remote_path:
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>attr</span> <span class=o>=</span> <span class=n>sftp</span><span class=o>.</span><span class=n>lstat</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>stat</span><span class=o>.</span><span class=n>S_ISDIR</span><span class=p>(</span><span class=n>attr</span><span class=o>.</span><span class=n>st_mode</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>get</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span> <span class=o>=</span> <span class=n>Path</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>Path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>remote_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>filepaths</span> <span class=o>=</span> <span class=n>traverse_remote_files</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>filepath</span> <span class=ow>in</span> <span class=n>filepaths</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>relpath</span> <span class=o>=</span> <span class=n>filepath</span><span class=o>.</span><span class=n>relative_to</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>local</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>relpath</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>conn</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>filepath</span><span class=p>),</span> <span class=n>normpath</span><span class=p>(</span><span class=n>local</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=k>except</span> <span class=ne>FileNotFoundError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;文件不存在&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=ow>not</span> <span class=n>local_path</span><span class=o>.</span><span class=n>suffix</span><span class=p>:</span>   <span class=c1># 如果本地路径没有提供文件名，默认为远程文件名</span>
+</span></span><span class=line><span class=cl>            <span class=n>local_path</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>remote_path</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>conn</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>),</span> <span class=n>normpath</span><span class=p>(</span><span class=n>local_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>FileNotFoundError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;文件不存在&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=fab命令><a href=#fab%e5%91%bd%e4%bb%a4 class=header-anchor></a>fab命令</h4><p>fab &ndash;help查看具体命令含义，这里列举的是fabric2的常用fab命令参数，和fabric1版本有很大不同。具体请参考<a class=link href=https://www.fabfile.org/upgrading.html#upgrading target=_blank rel=noopener>Upgrading from 1.x — Fabric documentation (fabfile.org)</a></p><div class=table-wrapper><table><thead><tr><th>参数</th><th>解释</th></tr></thead><tbody><tr><td>-l</td><td>列举任务列表（被@task装饰的函数才能被识别）</td></tr><tr><td>-c</td><td>从指定的任务模块名加载（默认为fabfile.py）</td></tr><tr><td>-r</td><td>从指定的根目录路径查找任务模块</td></tr><tr><td>-f</td><td>指定配置文件路径</td></tr><tr><td>-H</td><td>指定目标主机，多个主机逗号隔开</td></tr><tr><td>-V</td><td>显示Fabric、Paramiko、Invoke版本</td></tr><tr><td>-w</td><td>和warn=True效果一样，出现异常不会结束</td></tr></tbody></table></div><p><strong>示例</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=nd>@task</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>task1</span><span class=p>(</span><span class=n>c</span><span class=p>,</span> <span class=n>param</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;hello world, today is </span><span class=si>{</span><span class=n>param</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@task</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>task2</span><span class=p>(</span><span class=n>c</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=o>...</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl><span class=c1># 如果入口文件为fabfile.py，可以直接执行 fab -H localhost task2</span>
+</span></span></code></pre></td></tr></table></div></div><p>其中被<code>@task</code>装饰的函数必须有一个参数，否则会报：<code>TypeError: Tasks must have an initial Context argument!</code>。<br>假如入口文件不是fabfile.py且不指定的话，会报<code>Can't find any collection named 'fabfile'!</code>，fabric2中通过-c来指定加载的任务列表，<strong>官方API文档也说明了：&ndash;collection后面的参数是模块名而不是具体文件名</strong>。</p><p>比如上述的task函数存在于服务器<code>/home/yuqiuwen/PythonProjects/zhongxin/fab.py</code>路径下。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;通过本地调用远程服务器的脚本&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>now</span> <span class=o>=</span> <span class=n>datetime</span><span class=o>.</span><span class=n>datetime</span><span class=o>.</span><span class=n>now</span><span class=p>()</span><span class=o>.</span><span class=n>strftime</span><span class=p>(</span><span class=s2>&#34;%Y-%m-</span><span class=si>%d</span><span class=s2> %H:%M:%S&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># fabric2中通过--参数名的形式来传递变量值，如果参数有空格，要用引号</span>
+</span></span><span class=line><span class=cl><span class=n>conn</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;fab -c /home/yuqiuwen/PythonProjects/zhongxin/fab task1 --param &#39;</span><span class=si>{</span><span class=n>now</span><span class=si>}</span><span class=s2>&#39;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># 或者 -r指定查找目录</span>
+</span></span><span class=line><span class=cl><span class=c1># conn.run(f&#34;fab -r /home/yuqiuwen/PythonProjects/zhongxin/ -c fab task1 --param &#39;{now}&#39;&#34;)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>&gt;&gt;&gt;</span> <span class=n>output</span><span class=p>:</span> <span class=n>hello</span> <span class=n>world</span><span class=p>,</span> <span class=n>today</span> <span class=ow>is</span> <span class=mi>2022</span><span class=o>-</span><span class=mi>10</span><span class=o>-</span><span class=mi>30</span> <span class=mi>14</span><span class=p>:</span><span class=mi>19</span><span class=p>:</span><span class=mi>23</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;通过本地调用本地的脚本&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>invoke</span> <span class=kn>import</span> <span class=n>run</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># windows环境下貌似给now参数加引号也会报错，不知道什么原因</span>
+</span></span><span class=line><span class=cl><span class=n>run</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;fab -c 本地脚本路径 task1 --param &#39;</span><span class=si>{</span><span class=n>now</span><span class=si>}</span><span class=s2>&#39;&#34;</span><span class=p>,</span> <span class=n>out_stream</span><span class=o>=</span><span class=n>f</span><span class=p>,</span> <span class=n>err_stream</span><span class=o>=</span><span class=n>f</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>除此之外，还可以通过fab -l -F指定显示格式：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&gt; fab -r ./ -c fab  -l -F json
+</span></span><span class=line><span class=cl>output: <span class=o>{</span><span class=s2>&#34;name&#34;</span>: <span class=s2>&#34;fab&#34;</span>, <span class=s2>&#34;help&#34;</span>: null, <span class=s2>&#34;default&#34;</span>: null, <span class=s2>&#34;tasks&#34;</span>: <span class=o>[{</span><span class=s2>&#34;name&#34;</span>: <span class=s2>&#34;task1&#34;</span>, <span class=s2>&#34;help&#34;</span>: null, <span class=s2>&#34;aliases&#34;</span>: <span class=o>[]}</span>, <span class=o>{</span><span class=s2>&#34;name&#34;</span>: <span class=s2>&#34;task2&#34;</span>, <span class=s2>&#34;help&#34;</span>: null, <span class=s2>&#34;aliases&#34;</span>: <span class=o>[]}]</span>, <span class=s2>&#34;collections&#34;</span>: <span class=o>[]}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=封装-1><a href=#%e5%b0%81%e8%a3%85-1 class=header-anchor></a>封装</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>FabConnection</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>host</span><span class=p>,</span> <span class=n>user</span><span class=p>,</span> <span class=n>password</span><span class=p>,</span> <span class=n>port</span><span class=o>=</span><span class=mi>22</span><span class=p>,</span> <span class=n>mylogger</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_host</span> <span class=o>=</span> <span class=n>host</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_user</span> <span class=o>=</span> <span class=n>user</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_password</span> <span class=o>=</span> <span class=n>password</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_port</span> <span class=o>=</span> <span class=n>port</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span> <span class=o>=</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span> <span class=o>=</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span> <span class=o>=</span> <span class=n>mylogger</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>connect</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>connect</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 密钥文件方式</span>
+</span></span><span class=line><span class=cl>        <span class=c1># connect_kwargs={&#34;key_filename&#34;: &#34;/home/myuser/.ssh/private.key&#34;},</span>
+</span></span><span class=line><span class=cl>        <span class=n>conn</span> <span class=o>=</span> <span class=n>Connection</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>_user</span><span class=si>}</span><span class=s2>@</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>_host</span><span class=si>}</span><span class=s2>:</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>_port</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>connect_kwargs</span><span class=o>=</span><span class=p>{</span><span class=s2>&#34;password&#34;</span><span class=p>:</span> <span class=bp>self</span><span class=o>.</span><span class=n>_password</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span> <span class=o>=</span> <span class=n>conn</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span> <span class=o>=</span> <span class=n>conn</span><span class=o>.</span><span class=n>sftp</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>get</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span> <span class=o>=</span> <span class=n>Path</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>Path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>remote_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>filepaths</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>traverse_remote_files</span><span class=p>(</span><span class=n>remote_path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>filepath</span> <span class=ow>in</span> <span class=n>filepaths</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>relpath</span> <span class=o>=</span> <span class=n>filepath</span><span class=o>.</span><span class=n>relative_to</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=n>local</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>relpath</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>                <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>filepath</span><span class=p>),</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>local</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;download </span><span class=si>{</span><span class=n>relpath</span><span class=si>}</span><span class=s2> successful!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>except</span> <span class=ne>FileNotFoundError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;FileNotFoundError: </span><span class=si>{</span><span class=n>filepath</span><span class=si>}</span><span class=s2> -&gt; </span><span class=si>{</span><span class=n>local</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s1>&#39;error&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=ow>not</span> <span class=n>local_path</span><span class=o>.</span><span class=n>suffix</span><span class=p>:</span>   <span class=c1># 如果本地路径没有提供文件名，默认为远程文件名</span>
+</span></span><span class=line><span class=cl>                <span class=n>local_path</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>remote_path</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>),</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>local_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;download </span><span class=si>{</span><span class=n>remote_path</span><span class=si>}</span><span class=s2> successful!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>except</span> <span class=ne>FileNotFoundError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;FileNotFoundError: </span><span class=si>{</span><span class=n>remote_path</span><span class=si>}</span><span class=s2> -&gt; </span><span class=si>{</span><span class=n>local_path</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=s1>&#39;error&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>put</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>local_path</span><span class=p>,</span> <span class=n>remote_path</span> <span class=o>=</span> <span class=n>Path</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=n>Path</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>local_path</span><span class=o>.</span><span class=n>is_dir</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>path</span> <span class=ow>in</span> <span class=n>local_path</span><span class=o>.</span><span class=n>rglob</span><span class=p>(</span><span class=s1>&#39;[!.]*&#39;</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                <span class=c1># 拼接远程路径，relative_to获取相对路径</span>
+</span></span><span class=line><span class=cl>                <span class=n>remote</span> <span class=o>=</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>path</span><span class=o>.</span><span class=n>relative_to</span><span class=p>(</span><span class=n>local_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=n>path</span><span class=o>.</span><span class=n>is_file</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote</span><span class=o>.</span><span class=n>parent</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>  <span class=c1># 目标机器上不存在此路径需要创建</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span><span class=o>.</span><span class=n>put</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>path</span><span class=p>),</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;upload </span><span class=si>{</span><span class=n>path</span><span class=si>}</span><span class=s2> successful!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1># 上传单个文件</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>check_remote_path</span><span class=p>(</span><span class=n>remote_path</span><span class=o>.</span><span class=n>parent</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>remote_isdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>):</span>  <span class=c1># 若远程路径是一个目录，就将本地文件名作为默认名字</span>
+</span></span><span class=line><span class=cl>                <span class=n>remote_path</span> <span class=o>=</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>local_path</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span><span class=o>.</span><span class=n>put</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>local_path</span><span class=p>),</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>writer</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;upload the file </span><span class=si>{</span><span class=n>local_path</span><span class=si>}</span><span class=s2> successful!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>traverse_remote_files</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>:</span> <span class=n>Path</span><span class=p>,</span> <span class=n>local_path</span><span class=p>:</span> <span class=n>Path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>files_attr</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>listdir_attr</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>file_attr</span> <span class=ow>in</span> <span class=n>files_attr</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>filename</span> <span class=o>=</span> <span class=n>file_attr</span><span class=o>.</span><span class=n>filename</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>filename</span><span class=o>.</span><span class=n>startswith</span><span class=p>(</span><span class=s1>&#39;.&#39;</span><span class=p>):</span>  <span class=c1># 过滤以点开头的目录或文件</span>
+</span></span><span class=line><span class=cl>                <span class=k>continue</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 此处的local和remote可能为目录，也可能为文件</span>
+</span></span><span class=line><span class=cl>            <span class=n>local</span><span class=p>,</span> <span class=n>remote</span> <span class=o>=</span> <span class=n>local_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>filename</span><span class=p>),</span> <span class=n>remote_path</span><span class=o>.</span><span class=n>joinpath</span><span class=p>(</span><span class=n>filename</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 若为目录，则递归调用</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>stat</span><span class=o>.</span><span class=n>S_ISDIR</span><span class=p>(</span><span class=n>file_attr</span><span class=o>.</span><span class=n>st_mode</span><span class=p>):</span>  <span class=c1># st_mode判断文件类型（目录还是文件）</span>
+</span></span><span class=line><span class=cl>                <span class=k>yield from</span> <span class=bp>self</span><span class=o>.</span><span class=n>traverse_remote_files</span><span class=p>(</span><span class=n>remote</span><span class=p>,</span> <span class=n>local</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=k>yield</span> <span class=n>remote</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>close</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span><span class=p>,</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span> <span class=o>=</span> <span class=kc>None</span><span class=p>,</span> <span class=kc>None</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>writer</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>message</span><span class=p>,</span> <span class=n>level</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        自定义写入文件方法，同时支持logger或文件对象
+</span></span></span><span class=line><span class=cl><span class=s2>        :param message:
+</span></span></span><span class=line><span class=cl><span class=s2>        :param level:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=p>,</span> <span class=n>logging</span><span class=o>.</span><span class=n>Logger</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=ow>not</span> <span class=n>level</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>elif</span> <span class=n>level</span> <span class=o>==</span> <span class=s1>&#39;error&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=o>.</span><span class=n>error</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=n>message</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>message</span> <span class=o>+</span> <span class=s2>&#34;</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=n>message</span> <span class=o>+</span> <span class=s2>&#34;</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@staticmethod</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>normpath</span><span class=p>(</span><span class=n>path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        由于windows和linux操作系统不同，路径格式会出现不统一的情况，反斜杠不处理的话会出现很多问题
+</span></span></span><span class=line><span class=cl><span class=s2>        替换windows路径中的</span><span class=se>\
+</span></span></span><span class=line><span class=cl><span class=s2>        :param path:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=n>Path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>path</span> <span class=o>=</span> <span class=nb>str</span><span class=p>(</span><span class=n>path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>path</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s1>&#39;</span><span class=se>\\</span><span class=s1>&#39;</span><span class=p>,</span> <span class=s1>&#39;/&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>remote_isdir</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        检查一个远程路径是否为目录
+</span></span></span><span class=line><span class=cl><span class=s2>        :param remote_path:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=n>attr</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>lstat</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>stat</span><span class=o>.</span><span class=n>S_ISDIR</span><span class=p>(</span><span class=n>attr</span><span class=o>.</span><span class=n>st_mode</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>check_remote_path</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>remote_path</span><span class=p>,</span> <span class=n>is_mkdir</span><span class=o>=</span><span class=kc>False</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        判断目标机器路径是否存在
+</span></span></span><span class=line><span class=cl><span class=s2>        :param remote_path:
+</span></span></span><span class=line><span class=cl><span class=s2>        :param is_mkdir: 若为True，则会创建此路径
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>remote_path</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>normpath</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>lstat</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>FileNotFoundError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>is_mkdir</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=bp>self</span><span class=o>.</span><span class=n>_sftp</span><span class=o>.</span><span class=n>mkdir</span><span class=p>(</span><span class=n>remote_path</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>except</span> <span class=ne>PermissionError</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                    <span class=n>ret</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;sudo mkdir </span><span class=si>{</span><span class=n>remote_path</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>,</span> <span class=n>pty</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>watchers</span><span class=o>=</span><span class=p>[</span><span class=bp>self</span><span class=o>.</span><span class=n>sudo_pass</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>                    <span class=k>return</span> <span class=ow>not</span> <span class=n>ret</span><span class=p>[</span><span class=mi>2</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=kc>False</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@property</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>sudo_pass</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>sudopass</span> <span class=o>=</span> <span class=n>Responder</span><span class=p>(</span><span class=n>pattern</span><span class=o>=</span><span class=sa>fr</span><span class=s1>&#39;[sudo] password for </span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>_user</span><span class=si>}</span><span class=s1>:&#39;</span><span class=p>,</span> <span class=n>response</span><span class=o>=</span><span class=sa>f</span><span class=s1>&#39;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>_password</span><span class=si>}</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>,</span> <span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>sudopass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>run</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>cmd</span><span class=p>,</span> <span class=n>hide</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>warn</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>pty</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>watchers</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=c1># hide=True控制台不打印运行信息，当out_stream不为空时，hide参数无效</span>
+</span></span><span class=line><span class=cl>        <span class=n>ret</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span><span class=o>.</span><span class=n>run</span><span class=p>(</span><span class=n>cmd</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                             <span class=n>hide</span><span class=o>=</span><span class=n>hide</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                             <span class=n>warn</span><span class=o>=</span><span class=n>warn</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                             <span class=n>pty</span><span class=o>=</span><span class=n>pty</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                             <span class=n>out_stream</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                             <span class=n>err_stream</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>mylogger</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                             <span class=n>watchers</span><span class=o>=</span><span class=n>watchers</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                             <span class=n>encoding</span><span class=o>=</span><span class=s2>&#34;utf8&#34;</span>
+</span></span><span class=line><span class=cl>                             <span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>stdout</span><span class=p>,</span> <span class=n>stderr</span> <span class=o>=</span> <span class=n>ret</span><span class=o>.</span><span class=n>stdout</span><span class=o>.</span><span class=n>strip</span><span class=p>(),</span> <span class=n>ret</span><span class=o>.</span><span class=n>stderr</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>stdout</span><span class=p>,</span> <span class=n>stderr</span><span class=p>,</span> <span class=n>ret</span><span class=o>.</span><span class=n>failed</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@property</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>conn</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>_conn</span>
+</span></span></code></pre></td></tr></table></div></div></section><footer class="article-meta article-footer"><section class=article-tags><a href=/tags/paramiko/>Paramiko</a>
+<a href=/tags/fabric/>Fabric</a>
+<a href=/tags/devops/>DevOps</a>
+<a href=/tags/python/>Python</a></section></footer><nav class=article-prevnext aria-label=相邻文章><a class="article-prevnext__item article-prevnext__item--older" href=/p/linux-commands/ rel=prev><span class=article-prevnext__label><svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+<span>上一篇</span>
+</span><span class=article-prevnext__title>Linux Commands</span>
+<span class=article-prevnext__date>2022.10.27</span>
+</a><a class="article-prevnext__item article-prevnext__item--newer" href=/p/design-patterns/ rel=next><span class=article-prevnext__label><span>下一篇</span>
+<svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+</span><span class=article-prevnext__title>设计模式</span>
+<span class=article-prevnext__date>2022.11.06</span></a></nav></article><script type=module>
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main><footer class=site-footer><div class=site-footer__inner><div class=site-footer__cta><h2>有想法？<br><span>我们聊聊。</span></h2><a class=site-footer__email href=mailto:yuqiuwen2020@gmail.com>yuqiuwen2020@gmail.com ↗</a></div><div class=site-footer__bottom><span>© 2026 Yu Qiuwen</span><div class=site-footer__social><a href=mailto:yuqiuwen2020@gmail.com><svg class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg>
+<span>Email</span>
+</a><a href=https://github.com/yuqiuwen target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+<span>GitHub</span>
+</a><a href=/index.xml target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="5" cy="19" r="1"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg>
+<span>RSS</span></a></div></div></div></footer><script src=/js/gate.min.2d3ffea2c40fd0275c673de6c9daa61d0491889ed40ec7f56751951b9d0022f0.js integrity="sha256-LT/+osQP0CdcZz3mydqmHQSRiJ7UDsf1Z1GVG50AIvA=" defer></script><script type=text/javascript src=/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js defer></script></body></html>

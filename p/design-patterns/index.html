@@ -1,0 +1,371 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="常见设计模式总结"><title>设计模式</title><link rel=canonical href=https://yuqiuwen.github.io/p/design-patterns/><link rel=stylesheet href=/scss/style.min.4a914355c20926e8bdfe68714ac712c1fb2dc8c1d4ed7f5d9abd9d186f48784e.css><meta property='og:title' content="设计模式"><meta property='og:description' content="常见设计模式总结"><meta property='og:url' content='https://yuqiuwen.github.io/p/design-patterns/'><meta property='og:site_name' content='yuqiuwen'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:published_time' content='2022-11-06T00:00:00+00:00'><meta property='article:modified_time' content='2022-11-06T00:00:00+00:00'><meta name=twitter:title content="设计模式"><meta name=twitter:description content="常见设计模式总结"><link rel="shortcut icon" href=/img/favicon_hu_c31a0c718cbb325a.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"dark")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-nav><div class=site-nav__inner><a class=site-logo href=/>Yu.<span>QW</span></a><nav class=site-nav__links aria-label=主导航><a href=/>首页</a><a href=/projects/>作品集</a><a href=/post/ class=is-active aria-current=page>博客</a><a href=/food/>美食</a><a href=/about/>关于我</a><a href=/archives/>归档</a><a href=/search/>搜索</a></nav><button class=scheme-toggle id=dark-mode-toggle type=button aria-label="切换深色 / 浅色">
+<svg class="scheme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2m0 14.8v2.2M4.2 12H2m20 0h-2.2M6.2 6.2 4.7 4.7M19.3 19.3l-1.5-1.5m0-11.6 1.5-1.5M4.7 19.3l1.5-1.5"/></svg>
+<svg class="scheme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6.0 019.4 3.5a8.6 8.6.0 1011.1 11.1z"/></svg></button></div></header><main class=site-main><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E6%9C%AF/ style=background-color:#beefd9;color:#0f3d29>技术</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/design-patterns/>设计模式</a></h2><h3 class=article-subtitle>常见设计模式总结</h3></div><footer class=article-meta><div class=inline-meta><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2022-11-06T00:00:00Z>2022 年 11 月 6 日</time>
+<svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 3 分钟</time></div></footer></div></header><aside class=article-toc><details><summary><div class=article-toc-title><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目录</span></div></summary><nav class=toc-nav id=TableOfContents><ol><li><a href=#面向对象设计原则>面向对象设计原则</a></li><li><a href=#创建型模式>创建型模式</a><ol><li><a href=#工厂方法模式>工厂方法模式</a></li><li><a href=#抽象工厂模式>抽象工厂模式</a></li><li><a href=#创建者模式>创建者模式</a></li><li><a href=#原型模式>原型模式</a></li><li><a href=#单例模式>单例模式</a></li></ol></li><li><a href=#结构型模式>结构型模式</a><ol><li><a href=#适配器模式>适配器模式</a></li><li><a href=#桥模式>桥模式</a></li><li><a href=#组合模式>组合模式</a></li><li><a href=#装饰模式>装饰模式</a></li><li><a href=#外观模式>外观模式</a></li><li><a href=#享元模式>享元模式</a></li><li><a href=#代理模式>代理模式</a></li></ol></li><li><a href=#行为型模式>行为型模式</a><ol><li><a href=#解释器模式>解释器模式</a></li><li><a href=#责任链模式>责任链模式</a></li><li><a href=#命令模式>命令模式</a></li><li><a href=#迭代器模式>迭代器模式</a></li><li><a href=#中介者模式>中介者模式</a></li><li><a href=#备忘录模式>备忘录模式</a></li><li><a href=#观察者模式>观察者模式</a></li><li><a href=#状态模式>状态模式</a></li><li><a href=#策略模式>策略模式</a></li><li><a href=#访问者模式>访问者模式</a></li><li><a href=#模板方法模式>模板方法模式</a></li></ol></li></ol></nav></details></aside><section class=article-content><h2 id=面向对象设计原则><a href=#%e9%9d%a2%e5%90%91%e5%af%b9%e8%b1%a1%e8%ae%be%e8%ae%a1%e5%8e%9f%e5%88%99 class=header-anchor></a>面向对象设计原则</h2><ol><li><p><strong>开放封闭原则</strong></p><p>尽量不修改代码前提下进行扩展</p></li><li><p><strong>里氏替换原则</strong></p><p>尽量不重写父类方法，若要重写应满足以下要求：</p><ul><li><p>子类可以实现父类的抽象方法，但不能覆盖父类的非抽象方法</p></li><li><p>子类可以增加自己特有的方法</p></li><li><p>当子类的方法重载父类的方法时，方法的形参要比父类方法的输入参数更宽松</p></li><li><p>当子类的方法实现父类的抽象方法时，方法的返回值应比父类更严格</p></li></ul></li><li><p><strong>依赖倒置原则</strong></p><ul><li>高层模块不应该依赖底层模块，二者都应该依赖抽象。</li><li>抽象不应该依赖细节，细节应该依赖抽象。</li><li>依赖倒置的中心思想是面向接口编程。</li></ul></li><li><p><strong>接口隔离原则</strong></p><p>不要在一个接口里面放很多的方法，这样会显得这个类很臃肿</p><ul><li>客户端不应依赖它不需要的接口</li><li>类间的依赖关系应该建立在最小的接口上</li></ul></li><li><p><strong>单一职责原则</strong></p><p>一个类只负责一项职责</p></li></ol><h2 id=创建型模式><a href=#%e5%88%9b%e5%bb%ba%e5%9e%8b%e6%a8%a1%e5%bc%8f class=header-anchor></a>创建型模式</h2><h3 id=工厂方法模式><a href=#%e5%b7%a5%e5%8e%82%e6%96%b9%e6%b3%95%e6%a8%a1%e5%bc%8f class=header-anchor></a>工厂方法模式</h3><p><code>优点</code>：</p><ol><li>每一个具体产品对应一个工厂类，不需要修改工厂类代码</li><li>隐藏对象创建的内部细节</li></ol><p><code>缺点</code>：</p><p>每增加一个产品类，就必须增加一个工厂类</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>GreekLocalizer</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;A simple localizer a la gettext&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>translations</span> <span class=o>=</span> <span class=p>{</span><span class=s2>&#34;dog&#34;</span><span class=p>:</span> <span class=s2>&#34;σκύλος&#34;</span><span class=p>,</span> <span class=s2>&#34;cat&#34;</span><span class=p>:</span> <span class=s2>&#34;γάτα&#34;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>localize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>msg</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;We&#39;ll punt if we don&#39;t have a translation&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>translations</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>msg</span><span class=p>,</span> <span class=n>msg</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>EnglishLocalizer</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Simply echoes the message&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>localize</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>msg</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>msg</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>get_localizer</span><span class=p>(</span><span class=n>language</span><span class=p>:</span> <span class=nb>str</span> <span class=o>=</span> <span class=s2>&#34;English&#34;</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>object</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Factory&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>localizers</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;English&#34;</span><span class=p>:</span> <span class=n>EnglishLocalizer</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Greek&#34;</span><span class=p>:</span> <span class=n>GreekLocalizer</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>localizers</span><span class=p>[</span><span class=n>language</span><span class=p>]()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>main</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=n>e</span><span class=p>,</span> <span class=n>g</span> <span class=o>=</span> <span class=n>get_localizer</span><span class=p>(</span><span class=n>language</span><span class=o>=</span><span class=s2>&#34;English&#34;</span><span class=p>),</span> <span class=n>get_localizer</span><span class=p>(</span><span class=n>language</span><span class=o>=</span><span class=s2>&#34;Greek&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>msg</span> <span class=ow>in</span> <span class=s2>&#34;dog parrot cat bear&#34;</span><span class=o>.</span><span class=n>split</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>         <span class=nb>print</span><span class=p>(</span><span class=n>e</span><span class=o>.</span><span class=n>localize</span><span class=p>(</span><span class=n>msg</span><span class=p>),</span> <span class=n>g</span><span class=o>.</span><span class=n>localize</span><span class=p>(</span><span class=n>msg</span><span class=p>))</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=抽象工厂模式><a href=#%e6%8a%bd%e8%b1%a1%e5%b7%a5%e5%8e%82%e6%a8%a1%e5%bc%8f class=header-anchor></a>抽象工厂模式</h3><blockquote><p>提供一个创建一系列相关或者相互依赖产品的接口</p></blockquote><p><code>优点</code>：</p><p>除工厂方法模式的优点之外，还有利于约束产品族</p><p><code>缺点</code>：</p><p>扩展新的产品很麻烦</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>typing</span> <span class=kn>import</span> <span class=n>Type</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>abc</span> <span class=kn>import</span> <span class=n>abstractmethod</span><span class=p>,</span> <span class=n>ABCMeta</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Pet</span><span class=p>(</span><span class=n>metaclass</span><span class=o>=</span><span class=n>ABCMeta</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@abstractmethod</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>speak</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@abstractmethod</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__str__</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Dog</span><span class=p>(</span><span class=n>Pet</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>speak</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;&lt;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2>&gt;汪汪~&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__str__</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=sa>f</span><span class=s2>&#34;Dog&lt;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2>&gt;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Cat</span><span class=p>(</span><span class=n>Pet</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>speak</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;&lt;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2>&gt;喵喵~&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__str__</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=sa>f</span><span class=s2>&#34;Cat&lt;</span><span class=si>{</span><span class=bp>self</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2>&gt;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>PetShop</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>animal_factory</span><span class=p>:</span> <span class=n>Type</span><span class=p>[</span><span class=n>Pet</span><span class=p>])</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>pet_factory</span> <span class=o>=</span> <span class=n>animal_factory</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>buy_pet</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Pet</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>pet</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>pet_factory</span><span class=p>(</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;Here is your lovely </span><span class=si>{</span><span class=n>pet</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>pet</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>main</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>cat_shop</span> <span class=o>=</span> <span class=n>PetShop</span><span class=p>(</span><span class=n>Cat</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>dog_shop</span> <span class=o>=</span> <span class=n>PetShop</span><span class=p>(</span><span class=n>Dog</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>pet1</span> <span class=o>=</span> <span class=n>cat_shop</span><span class=o>.</span><span class=n>buy_pet</span><span class=p>(</span><span class=s2>&#34;布偶&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>pet1</span><span class=o>.</span><span class=n>speak</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>pet2</span> <span class=o>=</span> <span class=n>dog_shop</span><span class=o>.</span><span class=n>buy_pet</span><span class=p>(</span><span class=s2>&#34;阿拉斯加&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>pet2</span><span class=o>.</span><span class=n>speak</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span></code></pre></td></tr></table></div></div><h3 id=创建者模式><a href=#%e5%88%9b%e5%bb%ba%e8%80%85%e6%a8%a1%e5%bc%8f class=header-anchor></a>创建者模式</h3><blockquote><p>将一个复杂对象的创建于它的表示分离，使得同样的构建过程可以创建不同的表示</p></blockquote><p><code>优点</code>：</p><p>将构造代码与表示代码分开，可以精细控制构建过程</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>abc</span> <span class=kn>import</span> <span class=n>abstractmethod</span><span class=p>,</span> <span class=n>ABCMeta</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 抽象建造者</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Building</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>build_floor</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>build_size</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@abstractmethod</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>build_floor</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@abstractmethod</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>build_size</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__repr__</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s2>&#34;Floor: </span><span class=si>{0.floor}</span><span class=s2> | Size: </span><span class=si>{0.size}</span><span class=s2>&#34;</span><span class=o>.</span><span class=n>format</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 具体建造者</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>House</span><span class=p>(</span><span class=n>Building</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>build_floor</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>floor</span> <span class=o>=</span> <span class=s2>&#34;One&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>build_size</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>size</span> <span class=o>=</span> <span class=s2>&#34;Big&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 具体建造者</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Flat</span><span class=p>(</span><span class=n>Building</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>build_floor</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>floor</span> <span class=o>=</span> <span class=s2>&#34;More than One&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>build_size</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>size</span> <span class=o>=</span> <span class=s2>&#34;Small&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># In some very complex cases, it might be desirable to pull out the building</span>
+</span></span><span class=line><span class=cl><span class=c1># logic into another function (or a method on another class), rather than being</span>
+</span></span><span class=line><span class=cl><span class=c1># in the base class &#39;__init__&#39;. (This leaves you in the strange situation where</span>
+</span></span><span class=line><span class=cl><span class=c1># a concrete class does not have a useful constructor)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>ComplexBuilding</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__repr__</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s2>&#34;Floor: </span><span class=si>{0.floor}</span><span class=s2> | Size: </span><span class=si>{0.size}</span><span class=s2>&#34;</span><span class=o>.</span><span class=n>format</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>ComplexHouse</span><span class=p>(</span><span class=n>ComplexBuilding</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>build_floor</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>floor</span> <span class=o>=</span> <span class=s2>&#34;One&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>build_size</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>size</span> <span class=o>=</span> <span class=s2>&#34;Big and fancy&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 指挥者</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>construct_building</span><span class=p>(</span><span class=bp>cls</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Building</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>building</span> <span class=o>=</span> <span class=bp>cls</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>building</span><span class=o>.</span><span class=n>build_floor</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>building</span><span class=o>.</span><span class=n>build_size</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>building</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>main</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=n>house</span> <span class=o>=</span> <span class=n>House</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>flat</span> <span class=o>=</span> <span class=n>Flat</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>house</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>flat</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1># Using an external constructor function:</span>
+</span></span><span class=line><span class=cl>    <span class=n>complex_house</span> <span class=o>=</span> <span class=n>construct_building</span><span class=p>(</span><span class=n>ComplexHouse</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>complex_house</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># output</span>
+</span></span><span class=line><span class=cl><span class=n>Floor</span><span class=p>:</span> <span class=n>One</span> <span class=o>|</span> <span class=n>Size</span><span class=p>:</span> <span class=n>Big</span>
+</span></span><span class=line><span class=cl><span class=n>Floor</span><span class=p>:</span> <span class=n>More</span> <span class=n>than</span> <span class=n>One</span> <span class=o>|</span> <span class=n>Size</span><span class=p>:</span> <span class=n>Small</span>
+</span></span><span class=line><span class=cl><span class=n>Floor</span><span class=p>:</span> <span class=n>One</span> <span class=o>|</span> <span class=n>Size</span><span class=p>:</span> <span class=n>Big</span> <span class=ow>and</span> <span class=n>fancy</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=原型模式><a href=#%e5%8e%9f%e5%9e%8b%e6%a8%a1%e5%bc%8f class=header-anchor></a>原型模式</h3><h3 id=单例模式><a href=#%e5%8d%95%e4%be%8b%e6%a8%a1%e5%bc%8f class=header-anchor></a>单例模式</h3><blockquote><p>保证一个类只有一个实例</p></blockquote><h2 id=结构型模式><a href=#%e7%bb%93%e6%9e%84%e5%9e%8b%e6%a8%a1%e5%bc%8f class=header-anchor></a>结构型模式</h2><h3 id=适配器模式><a href=#%e9%80%82%e9%85%8d%e5%99%a8%e6%a8%a1%e5%bc%8f class=header-anchor></a>适配器模式</h3><h3 id=桥模式><a href=#%e6%a1%a5%e6%a8%a1%e5%bc%8f class=header-anchor></a>桥模式</h3><h3 id=组合模式><a href=#%e7%bb%84%e5%90%88%e6%a8%a1%e5%bc%8f class=header-anchor></a>组合模式</h3><h3 id=装饰模式><a href=#%e8%a3%85%e9%a5%b0%e6%a8%a1%e5%bc%8f class=header-anchor></a>装饰模式</h3><h3 id=外观模式><a href=#%e5%a4%96%e8%a7%82%e6%a8%a1%e5%bc%8f class=header-anchor></a>外观模式</h3><h3 id=享元模式><a href=#%e4%ba%ab%e5%85%83%e6%a8%a1%e5%bc%8f class=header-anchor></a>享元模式</h3><h3 id=代理模式><a href=#%e4%bb%a3%e7%90%86%e6%a8%a1%e5%bc%8f class=header-anchor></a>代理模式</h3><h2 id=行为型模式><a href=#%e8%a1%8c%e4%b8%ba%e5%9e%8b%e6%a8%a1%e5%bc%8f class=header-anchor></a>行为型模式</h2><h3 id=解释器模式><a href=#%e8%a7%a3%e9%87%8a%e5%99%a8%e6%a8%a1%e5%bc%8f class=header-anchor></a>解释器模式</h3><h3 id=责任链模式><a href=#%e8%b4%a3%e4%bb%bb%e9%93%be%e6%a8%a1%e5%bc%8f class=header-anchor></a>责任链模式</h3><h3 id=命令模式><a href=#%e5%91%bd%e4%bb%a4%e6%a8%a1%e5%bc%8f class=header-anchor></a>命令模式</h3><h3 id=迭代器模式><a href=#%e8%bf%ad%e4%bb%a3%e5%99%a8%e6%a8%a1%e5%bc%8f class=header-anchor></a>迭代器模式</h3><h3 id=中介者模式><a href=#%e4%b8%ad%e4%bb%8b%e8%80%85%e6%a8%a1%e5%bc%8f class=header-anchor></a>中介者模式</h3><h3 id=备忘录模式><a href=#%e5%a4%87%e5%bf%98%e5%bd%95%e6%a8%a1%e5%bc%8f class=header-anchor></a>备忘录模式</h3><h3 id=观察者模式><a href=#%e8%a7%82%e5%af%9f%e8%80%85%e6%a8%a1%e5%bc%8f class=header-anchor></a>观察者模式</h3><h3 id=状态模式><a href=#%e7%8a%b6%e6%80%81%e6%a8%a1%e5%bc%8f class=header-anchor></a>状态模式</h3><h3 id=策略模式><a href=#%e7%ad%96%e7%95%a5%e6%a8%a1%e5%bc%8f class=header-anchor></a>策略模式</h3><h3 id=访问者模式><a href=#%e8%ae%bf%e9%97%ae%e8%80%85%e6%a8%a1%e5%bc%8f class=header-anchor></a>访问者模式</h3><h3 id=模板方法模式><a href=#%e6%a8%a1%e6%9d%bf%e6%96%b9%e6%b3%95%e6%a8%a1%e5%bc%8f class=header-anchor></a>模板方法模式</h3></section><footer class="article-meta article-footer"></footer><nav class=article-prevnext aria-label=相邻文章><a class="article-prevnext__item article-prevnext__item--older" href=/p/paramiko-fabric/ rel=prev><span class=article-prevnext__label><svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+<span>上一篇</span>
+</span><span class=article-prevnext__title>自动化运维工具Paramiko & Fabric</span>
+<span class=article-prevnext__date>2022.10.30</span>
+</a><a class="article-prevnext__item article-prevnext__item--newer" href=/p/leetcode/ rel=next><span class=article-prevnext__label><span>下一篇</span>
+<svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+</span><span class=article-prevnext__title>LeetCode</span>
+<span class=article-prevnext__date>2022.11.16</span></a></nav></article><script type=module>
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main><footer class=site-footer><div class=site-footer__inner><div class=site-footer__cta><h2>有想法？<br><span>我们聊聊。</span></h2><a class=site-footer__email href=mailto:yuqiuwen2020@gmail.com>yuqiuwen2020@gmail.com ↗</a></div><div class=site-footer__bottom><span>© 2026 Yu Qiuwen</span><div class=site-footer__social><a href=mailto:yuqiuwen2020@gmail.com><svg class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg>
+<span>Email</span>
+</a><a href=https://github.com/yuqiuwen target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+<span>GitHub</span>
+</a><a href=/index.xml target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="5" cy="19" r="1"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg>
+<span>RSS</span></a></div></div></div></footer><script src=/js/gate.min.2d3ffea2c40fd0275c673de6c9daa61d0491889ed40ec7f56751951b9d0022f0.js integrity="sha256-LT/+osQP0CdcZz3mydqmHQSRiJ7UDsf1Z1GVG50AIvA=" defer></script><script type=text/javascript src=/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js defer></script></body></html>

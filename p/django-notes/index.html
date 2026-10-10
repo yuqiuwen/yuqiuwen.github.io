@@ -1,0 +1,578 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="涵盖Django常用技巧，Rest Framework、ORM等（持续更新中）"><title>Django笔记</title><link rel=canonical href=https://yuqiuwen.github.io/p/django-notes/><link rel=stylesheet href=/scss/style.min.4a914355c20926e8bdfe68714ac712c1fb2dc8c1d4ed7f5d9abd9d186f48784e.css><meta property='og:title' content="Django笔记"><meta property='og:description' content="涵盖Django常用技巧，Rest Framework、ORM等（持续更新中）"><meta property='og:url' content='https://yuqiuwen.github.io/p/django-notes/'><meta property='og:site_name' content='yuqiuwen'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Django'><meta property='article:tag' content='RestFramework'><meta property='article:published_time' content='2022-07-17T00:00:00+00:00'><meta property='article:modified_time' content='2022-07-17T00:00:00+00:00'><meta name=twitter:title content="Django笔记"><meta name=twitter:description content="涵盖Django常用技巧，Rest Framework、ORM等（持续更新中）"><link rel="shortcut icon" href=/img/favicon_hu_c31a0c718cbb325a.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"dark")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-nav><div class=site-nav__inner><a class=site-logo href=/>Yu.<span>QW</span></a><nav class=site-nav__links aria-label=主导航><a href=/>首页</a><a href=/projects/>作品集</a><a href=/post/ class=is-active aria-current=page>博客</a><a href=/food/>美食</a><a href=/about/>关于我</a><a href=/archives/>归档</a><a href=/search/>搜索</a></nav><button class=scheme-toggle id=dark-mode-toggle type=button aria-label="切换深色 / 浅色">
+<svg class="scheme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2m0 14.8v2.2M4.2 12H2m20 0h-2.2M6.2 6.2 4.7 4.7M19.3 19.3l-1.5-1.5m0-11.6 1.5-1.5M4.7 19.3l1.5-1.5"/></svg>
+<svg class="scheme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6.0 019.4 3.5a8.6 8.6.0 1011.1 11.1z"/></svg></button></div></header><main class=site-main><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E6%9C%AF/ style=background-color:#beefd9;color:#0f3d29>技术</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/django-notes/>Django笔记</a></h2><h3 class=article-subtitle>涵盖Django常用技巧，Rest Framework、ORM等（持续更新中）</h3></div><footer class=article-meta><div class=inline-meta><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2022-07-17T00:00:00Z>2022 年 7 月 17 日</time>
+<svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 6 分钟</time></div></footer></div></header><aside class=article-toc><details><summary><div class=article-toc-title><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目录</span></div></summary><nav class=toc-nav id=TableOfContents><ol><li><a href=#查询>查询</a><ol><li><a href=#orm>ORM</a></li><li><a href=#原生sql>原生sql</a></li><li><a href=#序列化>序列化</a></li></ol></li><li><a href=#另一个案例>另一个案例</a><ol><li><a href=#模型层>模型层</a></li><li><a href=#路由>路由</a></li><li><a href=#序列化器>序列化器</a></li><li><a href=#视图层>视图层</a></li></ol></li><li><a href=#自定义类>自定义类</a><ol><li><a href=#响应封装>响应封装</a></li></ol></li></ol></nav></details></aside><section class=article-content><blockquote><p><a class=link href=https://docs.djangoproject.com/zh-hans/3.2/ target=_blank rel=noopener>Django 文档 | Django 文档 | Django (djangoproject.com)</a></p></blockquote><h2 id=查询><a href=#%e6%9f%a5%e8%af%a2 class=header-anchor></a>查询</h2><p><strong>表结构</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Diabetes</span><span class=p>(</span><span class=n>BaseModel</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>user</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>ForeignKey</span><span class=p>(</span><span class=n>User</span><span class=p>,</span> <span class=n>on_delete</span><span class=o>=</span><span class=n>models</span><span class=o>.</span><span class=n>SET_NULL</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>pregnancies</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>IntegerField</span><span class=p>(</span><span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;怀孕次数&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>glucose</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>IntegerField</span><span class=p>(</span><span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;葡萄糖&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>blood_pressure</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>IntegerField</span><span class=p>(</span><span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;血压&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>skin_thickness</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>IntegerField</span><span class=p>(</span><span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;皮肤厚度&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>insulin</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>DecimalField</span><span class=p>(</span><span class=n>max_digits</span><span class=o>=</span><span class=mi>4</span><span class=p>,</span> <span class=n>decimal_places</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;胰岛素&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>bmi</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>DecimalField</span><span class=p>(</span><span class=n>max_digits</span><span class=o>=</span><span class=mi>4</span><span class=p>,</span> <span class=n>decimal_places</span><span class=o>=</span><span class=mi>2</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;身体质量指数&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>pedigree_function</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>DecimalField</span><span class=p>(</span><span class=n>max_digits</span><span class=o>=</span><span class=mi>4</span><span class=p>,</span> <span class=n>decimal_places</span><span class=o>=</span><span class=mi>3</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;遗传特性&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>age</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>IntegerField</span><span class=p>(</span><span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;年龄&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>outcome</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>IntegerField</span><span class=p>(</span><span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;预测结果,0正常/1发病&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>DecimalField</span><span class=p>(</span><span class=n>max_digits</span><span class=o>=</span><span class=mi>5</span><span class=p>,</span> <span class=n>decimal_places</span><span class=o>=</span><span class=mi>4</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;预测患病概率&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>class</span> <span class=nc>Meta</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>db_table</span> <span class=o>=</span> <span class=s1>&#39;diabetes&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>verbose_name</span> <span class=o>=</span> <span class=s1>&#39;糖尿病数据&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>verbose_name_plural</span> <span class=o>=</span> <span class=n>verbose_name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>User</span><span class=p>(</span><span class=n>AbstractUser</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>sexType</span> <span class=o>=</span> <span class=p>((</span><span class=s1>&#39;M&#39;</span><span class=p>,</span> <span class=s1>&#39;male&#39;</span><span class=p>),</span> <span class=p>(</span><span class=s1>&#39;F&#39;</span><span class=p>,</span> <span class=s1>&#39;Female&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=n>roles</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>IntegerField</span><span class=p>(</span><span class=n>default</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;角色&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>code</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>CharField</span><span class=p>(</span><span class=n>max_length</span><span class=o>=</span><span class=mi>256</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span><span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;邮箱验证码&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>c_time</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>DateTimeField</span><span class=p>(</span><span class=n>auto_now_add</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;注册提交时间&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>is_remember</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>BooleanField</span><span class=p>(</span><span class=n>default</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;是否记住登录状态&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>sex</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>CharField</span><span class=p>(</span><span class=n>max_length</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>choices</span><span class=o>=</span><span class=n>sexType</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=orm><a href=#orm class=header-anchor></a>ORM</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 1.使用annotate和F重命名字段</span>
+</span></span><span class=line><span class=cl><span class=n>user</span> <span class=o>=</span> <span class=n>User</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>annotate</span><span class=p>(</span><span class=n>userName</span><span class=o>=</span><span class=n>F</span><span class=p>(</span><span class=s1>&#39;username&#39;</span><span class=p>),</span> <span class=n>pregnancies_count</span><span class=o>=</span><span class=n>Count</span><span class=p>(</span><span class=s1>&#39;diabetes&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 2.查询每个用户有多少条Diabetes记录</span>
+</span></span><span class=line><span class=cl><span class=n>user</span> <span class=o>=</span> <span class=n>User</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>annotate</span><span class=p>(</span><span class=n>pregnancies_count</span><span class=o>=</span><span class=n>Count</span><span class=p>(</span><span class=s1>&#39;diabetes&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>user</span><span class=o>.</span><span class=n>values</span><span class=p>(</span><span class=s1>&#39;pregnancies_count&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 3.外键反向查询：查询用户为song的所有diabetes数据</span>
+</span></span><span class=line><span class=cl><span class=n>user</span> <span class=o>=</span> <span class=n>User</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>username</span><span class=o>=</span><span class=s1>&#39;song&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>first</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>user</span><span class=o>.</span><span class=n>diabetes_set</span><span class=o>.</span><span class=n>all</span><span class=p>()</span>  <span class=c1># 或者通过related_name查询：user.related_name.all()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 4.查询Diabetes表中所有用户为song的记录</span>
+</span></span><span class=line><span class=cl><span class=c1># 表名小写__字段名，或者related_name__字段名</span>
+</span></span><span class=line><span class=cl><span class=n>diabetes</span> <span class=o>=</span> <span class=n>Diabetes</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>user__username</span><span class=o>=</span><span class=s1>&#39;song&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>values</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 5.查询diabetes表中age=21的对应的所有user记录，queryset有重复可以使用distinct去重</span>
+</span></span><span class=line><span class=cl><span class=n>user</span> <span class=o>=</span> <span class=n>User</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>diabetes__age</span><span class=o>=</span><span class=mi>21</span><span class=p>)</span><span class=o>.</span><span class=n>values</span><span class=p>()</span><span class=o>.</span><span class=n>distinct</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 6.统计胰岛素含量的最高值和平均值之差</span>
+</span></span><span class=line><span class=cl><span class=n>Diabetes</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span><span class=o>.</span><span class=n>aggregate</span><span class=p>(</span><span class=n>insulin_diff</span><span class=o>=</span><span class=n>Max</span><span class=p>(</span><span class=s1>&#39;insulin&#39;</span><span class=p>)</span><span class=o>-</span><span class=n>Avg</span><span class=p>(</span><span class=s1>&#39;insulin&#39;</span><span class=p>))</span><span class=o>.</span><span class=n>values</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=原生sql><a href=#%e5%8e%9f%e7%94%9fsql class=header-anchor></a>原生sql</h3><p>复杂的sql语句可通过原生sql实现，绕过django模型层，直接执行sql语句</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>django.db</span> <span class=kn>import</span> <span class=n>connection</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查询一条记录</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>query_all</span><span class=p>(</span><span class=n>sql</span><span class=p>,</span> <span class=n>params</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>with</span> <span class=n>connection</span><span class=o>.</span><span class=n>cursor</span><span class=p>()</span> <span class=k>as</span> <span class=n>cursor</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>cursor</span><span class=o>.</span><span class=n>execute</span><span class=p>(</span><span class=n>sql</span><span class=p>,</span> <span class=n>params</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>columns</span> <span class=o>=</span> <span class=p>[</span><span class=n>col</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=k>for</span> <span class=n>col</span> <span class=ow>in</span> <span class=n>cursor</span><span class=o>.</span><span class=n>description</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=p>[</span><span class=nb>dict</span><span class=p>(</span><span class=nb>zip</span><span class=p>(</span><span class=n>columns</span><span class=p>,</span> <span class=n>row</span><span class=p>))</span><span class=k>for</span> <span class=n>row</span> <span class=ow>in</span> <span class=n>cursor</span><span class=o>.</span><span class=n>fetchall</span><span class=p>()]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查询多条记录</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>query_one</span><span class=p>(</span><span class=n>sql</span><span class=p>,</span> <span class=n>params</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>with</span> <span class=n>connection</span><span class=o>.</span><span class=n>cursor</span><span class=p>()</span> <span class=k>as</span> <span class=n>cursor</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=n>sql</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>cursor</span><span class=o>.</span><span class=n>execute</span><span class=p>(</span><span class=n>sql</span><span class=p>,</span> <span class=n>params</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>columns</span> <span class=o>=</span> <span class=p>[</span><span class=n>col</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=k>for</span> <span class=n>col</span> <span class=ow>in</span> <span class=n>cursor</span><span class=o>.</span><span class=n>description</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=p>[</span><span class=nb>dict</span><span class=p>(</span><span class=nb>zip</span><span class=p>(</span><span class=n>columns</span><span class=p>,</span> <span class=n>row</span><span class=p>))</span><span class=k>for</span> <span class=n>row</span> <span class=ow>in</span> <span class=n>cursor</span><span class=o>.</span><span class=n>fetchone</span><span class=p>()]</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl> <span class=c1># 执行查询</span>
+</span></span><span class=line><span class=cl><span class=n>sql</span> <span class=o>=</span> <span class=sa>f</span><span class=s2>&#34;&#34;&#34;select task_id, date_created, status, task_kwargs from django_celery_results_taskresult where task_id = %s&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl><span class=n>query</span> <span class=o>=</span> <span class=n>query_all</span><span class=p>(</span><span class=n>sql</span><span class=p>,</span> <span class=p>[</span><span class=n>task_id</span><span class=p>,</span> <span class=p>])</span>
+</span></span></code></pre></td></tr></table></div></div><blockquote><p><strong>Caution</strong></p><p>要避免 SQL 注入，你绝对不能在 SQL 字符串中用引号包裹 <code>%s</code> 占位符，使用 <code>params</code> 参数和不用引号包裹占位符使你免受 <a class=link href=https://en.wikipedia.org/wiki/SQL_injection target=_blank rel=noopener>SQL 注入攻击</a></p></blockquote><h3 id=序列化><a href=#%e5%ba%8f%e5%88%97%e5%8c%96 class=header-anchor></a>序列化</h3><blockquote><p>反序列化：json数据转换为模型对象</p><p>序列化：模型对象转换为json数据</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>post</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>s</span> <span class=o>=</span> <span class=n>DiabetesModelSerializer</span><span class=p>(</span><span class=n>data</span><span class=o>=</span><span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>s</span><span class=o>.</span><span class=n>save</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl><span class=n>get</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>diabetes</span> <span class=o>=</span> <span class=n>Diabetes</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>user</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>     <span class=c1># 如果查询集有多条，设置many=True，否则查询单条记录</span>
+</span></span><span class=line><span class=cl>    <span class=n>serializer</span> <span class=o>=</span> <span class=n>DiabetesModelSerializer</span><span class=p>(</span><span class=n>diabetes</span><span class=p>,</span> <span class=n>many</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>response_success</span><span class=p>(</span><span class=s2>&#34;查询成功&#34;</span><span class=p>,</span> <span class=n>serializer</span><span class=o>.</span><span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl><span class=n>put</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>diabetes</span> <span class=o>=</span> <span class=n>Diabetes</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>user</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#instance要更新的对象，partial默认false(需包含所有字段),设置为true表示局部修改</span>
+</span></span><span class=line><span class=cl>    <span class=n>s</span> <span class=o>=</span> <span class=n>DiabetesModelSerializer</span><span class=p>(</span><span class=n>instance</span><span class=o>=</span><span class=n>diabetes</span><span class=p>,</span> <span class=n>data</span><span class=o>=</span><span class=n>request</span><span class=o>.</span><span class=n>data</span><span class=p>,</span> <span class=n>partial</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>   
+</span></span><span class=line><span class=cl>    <span class=n>s</span><span class=o>.</span><span class=n>save</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>delete</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#采用逻辑删除，非物理删除，若queryset为单一，则删除一条，否则批量删除</span>
+</span></span><span class=line><span class=cl>    <span class=n>Diabetes</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>user</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span><span class=o>.</span><span class=n>update</span><span class=p>(</span><span class=n>is_active</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=另一个案例><a href=#%e5%8f%a6%e4%b8%80%e4%b8%aa%e6%a1%88%e4%be%8b class=header-anchor></a>另一个案例</h2><h3 id=模型层><a href=#%e6%a8%a1%e5%9e%8b%e5%b1%82 class=header-anchor></a>模型层</h3><p>现有两张表：班级表和学生表（一对多关系）</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Grade</span><span class=p>(</span><span class=n>BaseModel</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>name</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>CharField</span><span class=p>(</span><span class=n>max_length</span><span class=o>=</span><span class=mi>256</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;班级名称&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>class</span> <span class=nc>Meta</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>db_table</span> <span class=o>=</span> <span class=s1>&#39;grades&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>verbose_name</span> <span class=o>=</span> <span class=s1>&#39;班级表&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>verbose_name_plural</span> <span class=o>=</span> <span class=n>verbose_name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Students</span><span class=p>(</span><span class=n>BaseModel</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>sexTYPE</span> <span class=o>=</span> <span class=p>((</span><span class=s1>&#39;M&#39;</span><span class=p>,</span> <span class=s1>&#39;male&#39;</span><span class=p>),</span> <span class=p>(</span><span class=s1>&#39;F&#39;</span><span class=p>,</span> <span class=s1>&#39;Female&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=n>name</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>CharField</span><span class=p>(</span><span class=n>max_length</span><span class=o>=</span><span class=mi>256</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;姓名&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>sex</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>CharField</span><span class=p>(</span><span class=n>max_length</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>choices</span><span class=o>=</span><span class=n>sexTYPE</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s2>&#34;性别&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>stu_id</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>CharField</span><span class=p>(</span><span class=n>max_length</span><span class=o>=</span><span class=mi>256</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>verbose_name</span><span class=o>=</span><span class=s1>&#39;学号&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>grade</span> <span class=o>=</span> <span class=n>models</span><span class=o>.</span><span class=n>ForeignKey</span><span class=p>(</span><span class=n>to</span><span class=o>=</span><span class=n>Grade</span><span class=p>,</span> <span class=n>on_delete</span><span class=o>=</span><span class=n>models</span><span class=o>.</span><span class=n>SET_NULL</span><span class=p>,</span> <span class=n>blank</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>null</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>class</span> <span class=nc>Meta</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>db_table</span> <span class=o>=</span> <span class=s1>&#39;students&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>verbose_name</span> <span class=o>=</span> <span class=s1>&#39;学生表&#39;</span>
+</span></span><span class=line><span class=cl>        <span class=n>verbose_name_plural</span> <span class=o>=</span> <span class=n>verbose_name</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=路由><a href=#%e8%b7%af%e7%94%b1 class=header-anchor></a>路由</h3><p><code>app路由文件</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>rest_framework</span> <span class=kn>import</span> <span class=n>routers</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>django.urls</span> <span class=kn>import</span> <span class=n>path</span><span class=p>,</span> <span class=n>include</span>
+</span></span><span class=line><span class=cl><span class=n>from</span><span class=o>.</span><span class=n>views</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>router</span> <span class=o>=</span> <span class=n>routers</span><span class=o>.</span><span class=n>SimpleRouter</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>router</span><span class=o>.</span><span class=n>register</span><span class=p>(</span><span class=sa>r</span><span class=s2>&#34;stu&#34;</span><span class=p>,</span> <span class=n>DemoView</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>urlpatterns</span> <span class=o>=</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=n>path</span><span class=p>(</span><span class=sa>r</span><span class=s1>&#39;&#39;</span><span class=p>,</span> <span class=n>include</span><span class=p>(</span><span class=n>router</span><span class=o>.</span><span class=n>urls</span><span class=p>)),</span>
+</span></span><span class=line><span class=cl>    <span class=n>path</span><span class=p>(</span><span class=sa>r</span><span class=s1>&#39;grades/&#39;</span><span class=p>,</span> <span class=n>DemoView</span><span class=o>.</span><span class=n>as_view</span><span class=p>({</span><span class=s1>&#39;get&#39;</span><span class=p>:</span> <span class=s1>&#39;get_grades&#39;</span><span class=p>})),</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>总路由文件</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>urlpatterns</span> <span class=o>=</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=n>path</span><span class=p>(</span><span class=s1>&#39;admin/&#39;</span><span class=p>,</span> <span class=n>admin</span><span class=o>.</span><span class=n>site</span><span class=o>.</span><span class=n>urls</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=n>path</span><span class=p>(</span><span class=s1>&#39;api/&#39;</span><span class=p>,</span> <span class=n>include</span><span class=p>(</span><span class=s1>&#39;students.urls&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=序列化器><a href=#%e5%ba%8f%e5%88%97%e5%8c%96%e5%99%a8 class=header-anchor></a>序列化器</h3><p>DRF默认使用<code>PrimaryKeyRelatedField</code>序列化外键字段，为了前端展示，需要获取班级表的name和id字段</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>rest_framework</span> <span class=kn>import</span> <span class=n>serializers</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>rest_framework.fields</span> <span class=kn>import</span> <span class=n>DateTimeField</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>students.models</span> <span class=kn>import</span> <span class=n>Students</span><span class=p>,</span> <span class=n>Grade</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>GradeSerializer</span><span class=p>(</span><span class=n>serializers</span><span class=o>.</span><span class=n>ModelSerializer</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>class</span> <span class=nc>Meta</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>model</span> <span class=o>=</span> <span class=n>Grade</span>
+</span></span><span class=line><span class=cl>        <span class=n>fields</span> <span class=o>=</span> <span class=p>(</span><span class=s1>&#39;id&#39;</span><span class=p>,</span> <span class=s1>&#39;name&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>StudentSerializer</span><span class=p>(</span><span class=n>serializers</span><span class=o>.</span><span class=n>ModelSerializer</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>create_time</span> <span class=o>=</span> <span class=n>DateTimeField</span><span class=p>(</span><span class=nb>format</span><span class=o>=</span><span class=s2>&#34;%Y-%m-</span><span class=si>%d</span><span class=s2> %H:%M:%S&#34;</span><span class=p>,</span> <span class=n>required</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>read_only</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>update_time</span> <span class=o>=</span> <span class=n>DateTimeField</span><span class=p>(</span><span class=nb>format</span><span class=o>=</span><span class=s2>&#34;%Y-%m-</span><span class=si>%d</span><span class=s2> %H:%M:%S&#34;</span><span class=p>,</span> <span class=n>required</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>read_only</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 序列化主表所有字段(需是fields指定的)</span>
+</span></span><span class=line><span class=cl>    <span class=n>grade</span> <span class=o>=</span> <span class=n>GradeSerializer</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>class</span> <span class=nc>Meta</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>model</span> <span class=o>=</span> <span class=n>Students</span>
+</span></span><span class=line><span class=cl>        <span class=n>fields</span> <span class=o>=</span> <span class=s2>&#34;__all__&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=视图层><a href=#%e8%a7%86%e5%9b%be%e5%b1%82 class=header-anchor></a>视图层</h3><p>最基本的视图类如<code>APIView</code>，包含：get、post、delete、put，其他的还有<code>GenericAPIView</code></p><blockquote><p><a class=link href=https://www.django-rest-framework.org/api-guide/viewsets/#modelviewset target=_blank rel=noopener>Viewsets - Django REST framework (django-rest-framework.org)</a></p></blockquote><p>关于ViewSets我还没怎么研究，后面再看看吧。这里使用的是<code>ModelViewSet</code>视图集，<code>ModelViewSet</code>继承自<code>GenericAPIView</code>，包含：</p><p>list()、retrieve()、create()、update()、partial_update()。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span><span class=lnt>86
+</span><span class=lnt>87
+</span><span class=lnt>88
+</span><span class=lnt>89
+</span><span class=lnt>90
+</span><span class=lnt>91
+</span><span class=lnt>92
+</span><span class=lnt>93
+</span><span class=lnt>94
+</span><span class=lnt>95
+</span><span class=lnt>96
+</span><span class=lnt>97
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>datetime</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>traceback</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>django.db.models</span> <span class=kn>import</span> <span class=n>F</span><span class=p>,</span> <span class=n>Q</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>rest_framework.decorators</span> <span class=kn>import</span> <span class=n>action</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>rest_framework.permissions</span> <span class=kn>import</span> <span class=n>AllowAny</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>rest_framework.viewsets</span> <span class=kn>import</span> <span class=n>ModelViewSet</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Create your views here.</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>.models</span> <span class=kn>import</span> <span class=n>Students</span>
+</span></span><span class=line><span class=cl><span class=n>from</span><span class=o>.</span><span class=n>serializers</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>common.http_response</span> <span class=kn>import</span> <span class=n>HttpResponse</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>DemoView</span><span class=p>(</span><span class=n>ModelViewSet</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=c1># permission_classes = [AllowAny]</span>
+</span></span><span class=line><span class=cl>    <span class=n>queryset</span> <span class=o>=</span> <span class=n>Students</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span><span class=o>.</span><span class=n>order_by</span><span class=p>(</span><span class=s1>&#39;-update_time&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>serializer_class</span> <span class=o>=</span> <span class=n>StudentSerializer</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>create</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>request</span><span class=p>,</span> <span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        新增数据
+</span></span></span><span class=line><span class=cl><span class=s2>        :param request:
+</span></span></span><span class=line><span class=cl><span class=s2>        :param args:
+</span></span></span><span class=line><span class=cl><span class=s2>        :param kwargs:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>ser</span> <span class=o>=</span> <span class=n>StudentSerializer</span><span class=p>(</span><span class=n>data</span><span class=o>=</span><span class=n>request</span><span class=o>.</span><span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=n>ser</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>ser</span><span class=o>.</span><span class=n>is_valid</span><span class=p>(</span><span class=n>raise_exception</span><span class=o>=</span><span class=kc>True</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                <span class=n>ser</span><span class=o>.</span><span class=n>save</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=o>.</span><span class=n>response_success</span><span class=p>(</span><span class=s2>&#34;创建成功&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>traceback</span><span class=o>.</span><span class=n>print_exc</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=o>.</span><span class=n>response_failed</span><span class=p>(</span><span class=s2>&#34;创建失败&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 自定义方法：url_path表示请求接口名，使用后可以不用在路由中单独注册, 访问格式：/stu/info</span>
+</span></span><span class=line><span class=cl>    <span class=nd>@action</span><span class=p>(</span><span class=n>methods</span><span class=o>=</span><span class=p>[</span><span class=s1>&#39;get&#39;</span><span class=p>],</span> <span class=n>detail</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>url_path</span><span class=o>=</span><span class=s1>&#39;info&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>get_stu_info</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>request</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        获取学生信息，支持模糊查询
+</span></span></span><span class=line><span class=cl><span class=s2>        :param request: name
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>name</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>GET</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>&#39;name&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>grade</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>GET</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>&#39;grade&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>stu_id</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>GET</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>&#39;stu_id&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=nb>id</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>GET</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>&#39;id&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=nb>id</span> <span class=ow>and</span> <span class=nb>id</span> <span class=o>!=</span> <span class=s1>&#39;&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>stu</span> <span class=o>=</span> <span class=n>Students</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=nb>id</span><span class=o>=</span><span class=nb>id</span><span class=p>)</span><span class=o>.</span><span class=n>order_by</span><span class=p>(</span><span class=s1>&#39;-update_time&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=c1># grade__name__contains=grade 表示 在学生表中按班级名查询</span>
+</span></span><span class=line><span class=cl>                <span class=n>stu</span> <span class=o>=</span> <span class=n>Students</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>                    <span class=n>Q</span><span class=p>(</span><span class=n>stu_id__contains</span><span class=o>=</span><span class=n>stu_id</span><span class=p>)</span> <span class=o>&amp;</span> <span class=n>Q</span><span class=p>(</span><span class=n>name__contains</span><span class=o>=</span><span class=n>name</span><span class=p>)</span> <span class=o>&amp;</span> <span class=n>Q</span><span class=p>(</span><span class=n>grade__name__contains</span><span class=o>=</span><span class=n>grade</span><span class=p>))</span><span class=o>.</span><span class=n>order_by</span><span class=p>(</span><span class=s1>&#39;-update_time&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=c1># stu = stu.annotate(grade=F(&#39;grade_id&#39;))</span>
+</span></span><span class=line><span class=cl>            <span class=n>ser</span> <span class=o>=</span> <span class=n>StudentSerializer</span><span class=p>(</span><span class=n>stu</span><span class=p>,</span> <span class=n>many</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=o>.</span><span class=n>response_success</span><span class=p>(</span><span class=s2>&#34;查询成功&#34;</span><span class=p>,</span> <span class=n>ser</span><span class=o>.</span><span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>traceback</span><span class=o>.</span><span class=n>print_exc</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=o>.</span><span class=n>response_failed</span><span class=p>(</span><span class=s2>&#34;查询失败&#34;</span><span class=p>,)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>put</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>request</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        修改方法
+</span></span></span><span class=line><span class=cl><span class=s2>        :param request:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>stu_id</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>&#39;id&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>stu</span> <span class=o>=</span> <span class=n>Students</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=nb>id</span><span class=o>=</span><span class=n>stu_id</span><span class=p>)</span><span class=o>.</span><span class=n>first</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=n>data</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>data</span>
+</span></span><span class=line><span class=cl>            <span class=n>cur_time</span> <span class=o>=</span> <span class=n>datetime</span><span class=o>.</span><span class=n>datetime</span><span class=o>.</span><span class=n>now</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=n>data</span><span class=p>[</span><span class=s1>&#39;create_time&#39;</span><span class=p>],</span> <span class=n>data</span><span class=p>[</span><span class=s1>&#39;update_time&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>cur_time</span><span class=p>,</span> <span class=n>cur_time</span>
+</span></span><span class=line><span class=cl>            <span class=n>ser</span> <span class=o>=</span> <span class=n>StudentSerializer</span><span class=p>(</span><span class=n>instance</span><span class=o>=</span><span class=n>stu</span><span class=p>,</span> <span class=n>data</span><span class=o>=</span><span class=n>data</span><span class=p>,</span> <span class=n>partial</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>ser</span><span class=o>.</span><span class=n>is_valid</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>                <span class=n>ser</span><span class=o>.</span><span class=n>save</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=o>.</span><span class=n>response_success</span><span class=p>(</span><span class=s2>&#34;创建成功&#34;</span><span class=p>,)</span>
+</span></span><span class=line><span class=cl>        <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>traceback</span><span class=o>.</span><span class=n>print_exc</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=o>.</span><span class=n>response_failed</span><span class=p>(</span><span class=s2>&#34;创建失败&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@action</span><span class=p>(</span><span class=n>methods</span><span class=o>=</span><span class=p>[</span><span class=s1>&#39;GET&#39;</span><span class=p>],</span> <span class=n>detail</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>get_grades</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>request</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>        获取所有班级信息, 并对结果集字段重命名
+</span></span></span><span class=line><span class=cl><span class=s2>        :param request:
+</span></span></span><span class=line><span class=cl><span class=s2>        :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=n>grades</span> <span class=o>=</span> <span class=n>Grade</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>annotate</span><span class=p>(</span><span class=n>label</span><span class=o>=</span><span class=n>F</span><span class=p>(</span><span class=s1>&#39;name&#39;</span><span class=p>),</span> <span class=n>value</span><span class=o>=</span><span class=n>F</span><span class=p>(</span><span class=s1>&#39;id&#39;</span><span class=p>))</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>is_active</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span><span class=o>.</span><span class=n>values</span><span class=p>(</span><span class=s1>&#39;label&#39;</span><span class=p>,</span> <span class=s1>&#39;value&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>HttpResponse</span><span class=o>.</span><span class=n>response_success</span><span class=p>(</span><span class=s2>&#34;查询所有班级成功&#34;</span><span class=p>,</span> <span class=n>grades</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>上面使用到了Q查询，配合<code>&</code>、<code>|</code>可以完成复杂的查询。使用<code>~</code>表示not反转： <code>Q(question__startswith='Who') | ~Q(pub_date__year=2005)</code></p><blockquote><p><strong>Info</strong></p><p>Q对象必须位于关键字参数之前</p></blockquote><h2 id=自定义类><a href=#%e8%87%aa%e5%ae%9a%e4%b9%89%e7%b1%bb class=header-anchor></a>自定义类</h2><h3 id=响应封装><a href=#%e5%93%8d%e5%ba%94%e5%b0%81%e8%a3%85 class=header-anchor></a>响应封装</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>rest_framework.response</span> <span class=kn>import</span> <span class=n>Response</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>rest_framework.status</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>HttpResponse</span><span class=p>(</span><span class=n>Response</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>data_status</span><span class=o>=</span><span class=s1>&#39;&#39;</span><span class=p>,</span> <span class=n>message</span><span class=o>=</span><span class=s1>&#39;&#39;</span><span class=p>,</span> <span class=n>results</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span> <span class=n>status</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span> <span class=n>headers</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span> <span class=n>exception</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>data</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;code&#39;</span><span class=p>:</span> <span class=n>data_status</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;msg&#39;</span><span class=p>:</span> <span class=n>message</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>results</span> <span class=ow>is</span> <span class=ow>not</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>data</span><span class=p>[</span><span class=s1>&#39;results&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>results</span>
+</span></span><span class=line><span class=cl>        <span class=n>data</span><span class=o>.</span><span class=n>update</span><span class=p>(</span><span class=n>kwargs</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=fm>__init__</span><span class=p>(</span><span class=n>data</span><span class=o>=</span><span class=n>data</span><span class=p>,</span> <span class=n>status</span><span class=o>=</span><span class=n>status</span><span class=p>,</span> <span class=n>headers</span><span class=o>=</span><span class=n>headers</span><span class=p>,</span> <span class=n>exception</span><span class=o>=</span><span class=n>exception</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@classmethod</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>response_success</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>message</span><span class=o>=</span><span class=s1>&#39;&#39;</span><span class=p>,</span> <span class=n>data</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>HttpResponse</span><span class=p>(</span><span class=n>HTTP_200_OK</span><span class=p>,</span> <span class=n>message</span><span class=o>=</span><span class=n>message</span><span class=p>,</span> <span class=n>results</span><span class=o>=</span><span class=n>data</span><span class=p>,</span> <span class=n>status</span><span class=o>=</span><span class=n>HTTP_200_OK</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nd>@classmethod</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>response_failed</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>message</span><span class=o>=</span><span class=s1>&#39;&#39;</span><span class=p>,</span> <span class=n>data</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>HttpResponse</span><span class=p>(</span><span class=n>HTTP_500_INTERNAL_SERVER_ERROR</span><span class=p>,</span> <span class=n>message</span><span class=o>=</span><span class=n>message</span><span class=p>,</span> <span class=n>results</span><span class=o>=</span><span class=n>data</span><span class=p>,</span> <span class=n>status</span><span class=o>=</span><span class=n>HTTP_500_INTERNAL_SERVER_ERROR</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div></section><footer class="article-meta article-footer"><section class=article-tags><a href=/tags/django/>Django</a>
+<a href=/tags/restframework/>RestFramework</a></section></footer><nav class=article-prevnext aria-label=相邻文章><a class="article-prevnext__item article-prevnext__item--newer" href=/p/markdown-handbook/ rel=next><span class=article-prevnext__label><span>下一篇</span>
+<svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+</span><span class=article-prevnext__title>MarkDown Handbook</span>
+<span class=article-prevnext__date>2022.07.20</span></a></nav></article><script type=module>
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main><footer class=site-footer><div class=site-footer__inner><div class=site-footer__cta><h2>有想法？<br><span>我们聊聊。</span></h2><a class=site-footer__email href=mailto:yuqiuwen2020@gmail.com>yuqiuwen2020@gmail.com ↗</a></div><div class=site-footer__bottom><span>© 2026 Yu Qiuwen</span><div class=site-footer__social><a href=mailto:yuqiuwen2020@gmail.com><svg class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg>
+<span>Email</span>
+</a><a href=https://github.com/yuqiuwen target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+<span>GitHub</span>
+</a><a href=/index.xml target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="5" cy="19" r="1"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg>
+<span>RSS</span></a></div></div></div></footer><script src=/js/gate.min.2d3ffea2c40fd0275c673de6c9daa61d0491889ed40ec7f56751951b9d0022f0.js integrity="sha256-LT/+osQP0CdcZz3mydqmHQSRiJ7UDsf1Z1GVG50AIvA=" defer></script><script type=text/javascript src=/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js defer></script></body></html>

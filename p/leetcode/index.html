@@ -1,0 +1,591 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="基本算法"><title>LeetCode</title><link rel=canonical href=https://yuqiuwen.github.io/p/leetcode/><link rel=stylesheet href=/scss/style.min.4a914355c20926e8bdfe68714ac712c1fb2dc8c1d4ed7f5d9abd9d186f48784e.css><meta property='og:title' content="LeetCode"><meta property='og:description' content="基本算法"><meta property='og:url' content='https://yuqiuwen.github.io/p/leetcode/'><meta property='og:site_name' content='yuqiuwen'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='查找'><meta property='article:tag' content='排序'><meta property='article:tag' content='动态规划'><meta property='article:published_time' content='2022-11-16T00:00:00+00:00'><meta property='article:modified_time' content='2022-11-16T00:00:00+00:00'><meta name=twitter:title content="LeetCode"><meta name=twitter:description content="基本算法"><link rel="shortcut icon" href=/img/favicon_hu_c31a0c718cbb325a.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"dark")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-nav><div class=site-nav__inner><a class=site-logo href=/>Yu.<span>QW</span></a><nav class=site-nav__links aria-label=主导航><a href=/>首页</a><a href=/projects/>作品集</a><a href=/post/ class=is-active aria-current=page>博客</a><a href=/food/>美食</a><a href=/about/>关于我</a><a href=/archives/>归档</a><a href=/search/>搜索</a></nav><button class=scheme-toggle id=dark-mode-toggle type=button aria-label="切换深色 / 浅色">
+<svg class="scheme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2m0 14.8v2.2M4.2 12H2m20 0h-2.2M6.2 6.2 4.7 4.7M19.3 19.3l-1.5-1.5m0-11.6 1.5-1.5M4.7 19.3l1.5-1.5"/></svg>
+<svg class="scheme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6.0 019.4 3.5a8.6 8.6.0 1011.1 11.1z"/></svg></button></div></header><main class=site-main><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E6%9C%AF/ style=background-color:#beefd9;color:#0f3d29>技术</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/leetcode/>LeetCode</a></h2><h3 class=article-subtitle>基本算法</h3></div><footer class=article-meta><div class=inline-meta><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2022-11-16T00:00:00Z>2022 年 11 月 16 日</time>
+<svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 6 分钟</time></div></footer></div></header><aside class=article-toc><details><summary><div class=article-toc-title><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目录</span></div></summary><nav class=toc-nav id=TableOfContents><ol><li><a href=#算法>算法</a><ol><li><a href=#查找>查找</a><ol><li><a href=#二分查找>二分查找</a></li></ol></li><li><a href=#排序>排序</a><ol><li><a href=#冒泡>冒泡</a></li><li><a href=#快排>快排</a></li><li><a href=#选择>选择</a></li><li><a href=#归并>归并</a></li><li><a href=#基础>基础</a></li><li><a href=#动态规划>动态规划</a></li><li><a href=#滑动窗口>滑动窗口</a></li><li><a href=#数组和树形数据转换>数组和树形数据转换</a></li><li><a href=#最大数字组合>最大数字组合</a></li></ol></li></ol></li><li><a href=#mysql>MySQL</a><ol><li><a href=#基础-1>基础</a></li><li><a href=#次日留存率>次日留存率</a></li></ol></li></ol></nav></details></aside><section class=article-content><h2 id=算法><a href=#%e7%ae%97%e6%b3%95 class=header-anchor></a>算法</h2><h3 id=查找><a href=#%e6%9f%a5%e6%89%be class=header-anchor></a>查找</h3><h4 id=二分查找><a href=#%e4%ba%8c%e5%88%86%e6%9f%a5%e6%89%be class=header-anchor></a>二分查找</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>binsearch</span><span class=p>(</span><span class=n>arr</span><span class=p>,</span> <span class=n>target</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>low</span><span class=p>,</span> <span class=n>high</span> <span class=o>=</span> <span class=mi>0</span><span class=p>,</span> <span class=nb>len</span><span class=p>(</span><span class=n>arr</span><span class=p>)</span><span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>low</span> <span class=o>&lt;=</span> <span class=n>high</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>mid</span> <span class=o>=</span> <span class=p>(</span><span class=n>low</span> <span class=o>+</span> <span class=n>high</span><span class=p>)</span> <span class=o>//</span> <span class=mi>2</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>target</span> <span class=o>==</span> <span class=n>arr</span><span class=p>[</span><span class=n>mid</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>mid</span>
+</span></span><span class=line><span class=cl>        <span class=k>elif</span> <span class=n>target</span> <span class=o>&gt;</span> <span class=n>arr</span><span class=p>[</span><span class=n>mid</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>            <span class=n>low</span> <span class=o>=</span> <span class=n>mid</span> <span class=o>+</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>high</span> <span class=o>=</span> <span class=n>mid</span> <span class=o>-</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>-</span><span class=mi>1</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=排序><a href=#%e6%8e%92%e5%ba%8f class=header-anchor></a>排序</h3><h4 id=冒泡><a href=#%e5%86%92%e6%b3%a1 class=header-anchor></a>冒泡</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>冒泡排序:每趟能确定一个元素的最终位置
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>bubble_sort</span><span class=p>(</span><span class=n>data</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>n</span> <span class=o>=</span> <span class=nb>len</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>n</span><span class=o>-</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>j</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>n</span><span class=o>-</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>data</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&gt;</span> <span class=n>data</span><span class=p>[</span><span class=n>j</span><span class=o>+</span><span class=mi>1</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>                <span class=n>data</span><span class=p>[</span><span class=n>j</span><span class=p>],</span> <span class=n>data</span><span class=p>[</span><span class=n>j</span><span class=o>+</span><span class=mi>1</span><span class=p>]</span> <span class=o>=</span> <span class=n>data</span><span class=p>[</span><span class=n>j</span><span class=o>+</span><span class=mi>1</span><span class=p>],</span> <span class=n>data</span><span class=p>[</span><span class=n>j</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>data</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=快排><a href=#%e5%bf%ab%e6%8e%92 class=header-anchor></a>快排</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>quick_sort</span><span class=p>(</span><span class=n>arr</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 用栈保存区间左右边界，右边界先入栈</span>
+</span></span><span class=line><span class=cl>    <span class=n>stack</span> <span class=o>=</span> <span class=p>[</span><span class=nb>len</span><span class=p>(</span><span class=n>arr</span><span class=p>)</span><span class=o>-</span><span class=mi>1</span><span class=p>,</span> <span class=mi>0</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>stack</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>low</span><span class=p>,</span> <span class=n>high</span> <span class=o>=</span> <span class=n>stack</span><span class=o>.</span><span class=n>pop</span><span class=p>(),</span> <span class=n>stack</span><span class=o>.</span><span class=n>pop</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=n>p</span> <span class=o>=</span> <span class=n>partition</span><span class=p>(</span><span class=n>arr</span><span class=p>,</span> <span class=n>low</span><span class=p>,</span> <span class=n>high</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 基准元素的左区间存在则入栈</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>p</span> <span class=o>&gt;</span> <span class=n>low</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>stack</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>p</span> <span class=o>-</span> <span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>stack</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>low</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 基准元素的右区间存在则入栈</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>high</span> <span class=o>&gt;</span> <span class=n>p</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>stack</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>high</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>stack</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>p</span> <span class=o>+</span> <span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>arr</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>partition</span><span class=p>(</span><span class=n>arr</span><span class=p>,</span> <span class=n>low</span><span class=p>,</span> <span class=n>high</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 选取第一个元素作为基准元素</span>
+</span></span><span class=line><span class=cl>    <span class=n>p</span> <span class=o>=</span> <span class=n>arr</span><span class=p>[</span><span class=n>low</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>low</span> <span class=o>&lt;</span> <span class=n>high</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 比基准元素小的移到前面</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=n>low</span> <span class=o>&lt;</span> <span class=n>high</span> <span class=ow>and</span> <span class=n>arr</span><span class=p>[</span><span class=n>high</span><span class=p>]</span> <span class=o>&gt;=</span> <span class=n>p</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>high</span> <span class=o>-=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=n>arr</span><span class=p>[</span><span class=n>low</span><span class=p>]</span> <span class=o>=</span> <span class=n>arr</span><span class=p>[</span><span class=n>high</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 比基准元素大的移到后面</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=n>low</span> <span class=o>&lt;</span> <span class=n>high</span> <span class=ow>and</span> <span class=n>arr</span><span class=p>[</span><span class=n>low</span><span class=p>]</span> <span class=o>&lt;=</span> <span class=n>p</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>low</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=n>arr</span><span class=p>[</span><span class=n>high</span><span class=p>]</span> <span class=o>=</span> <span class=n>arr</span><span class=p>[</span><span class=n>low</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#     将基准元素放到最终的位置</span>
+</span></span><span class=line><span class=cl>    <span class=n>arr</span><span class=p>[</span><span class=n>low</span><span class=p>]</span> <span class=o>=</span> <span class=n>p</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>low</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=选择><a href=#%e9%80%89%e6%8b%a9 class=header-anchor></a>选择</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>选择排序：每趟（i）从后面的n-i+1个待排元素选择1个最小的作为最终第i个元素的值
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>select_sort</span><span class=p>(</span><span class=n>arr</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>n</span> <span class=o>=</span> <span class=nb>len</span><span class=p>(</span><span class=n>arr</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>n</span><span class=o>-</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>min</span> <span class=o>=</span> <span class=n>i</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>j</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>,</span> <span class=n>n</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>arr</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&lt;</span> <span class=n>arr</span><span class=p>[</span><span class=nb>min</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>                <span class=nb>min</span> <span class=o>=</span> <span class=n>j</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 若第一个数字不是最小值，则交换位置</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nb>min</span> <span class=o>!=</span> <span class=n>i</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>arr</span><span class=p>[</span><span class=n>i</span><span class=p>],</span> <span class=n>arr</span><span class=p>[</span><span class=nb>min</span><span class=p>]</span> <span class=o>=</span> <span class=n>arr</span><span class=p>[</span><span class=nb>min</span><span class=p>],</span> <span class=n>arr</span><span class=p>[</span><span class=n>i</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>arr</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=归并><a href=#%e5%bd%92%e5%b9%b6 class=header-anchor></a>归并</h4><p><img alt=image-20220814143834015 class=gallery-image data-flex-basis=272px data-flex-grow=113 height=637 loading=lazy sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src=/p/leetcode/image-20220814143834015_hu_e6e9477907cadecc.png width=723></p><p>==思路==：</p><ol><li>针对上图序列A（3,9）和序列B（1,4），指针i指向3，j指向1</li><li>1 &lt; 3，1添加到temp，同时指针j后移</li><li>3 &lt; 4，3添加到temp，同时指针i后移</li><li>4 &lt; 9，4添加到temp，同时指针j后移，此时j=8 > 右边界r=7,跳出循环</li><li>此时i=5,j=8,mid=5,l=4,r=7，将剩下的序列A中的元素添加到temp列表中</li><li>将temp中的所有元素赋给原序列arr对应位置</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>merge</span><span class=p>(</span><span class=n>arr</span><span class=p>,</span> <span class=n>l</span><span class=p>,</span> <span class=n>r</span><span class=p>,</span> <span class=n>mid</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>temp</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    <span class=n>i</span><span class=p>,</span> <span class=n>j</span> <span class=o>=</span> <span class=n>l</span><span class=p>,</span> <span class=n>mid</span> <span class=o>+</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>i</span> <span class=o>&lt;=</span> <span class=n>mid</span> <span class=ow>and</span> <span class=n>j</span> <span class=o>&lt;=</span> <span class=n>r</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>arr</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&lt;</span> <span class=n>arr</span><span class=p>[</span><span class=n>j</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>            <span class=n>temp</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>arr</span><span class=p>[</span><span class=n>i</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>            <span class=n>i</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>temp</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>arr</span><span class=p>[</span><span class=n>j</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>            <span class=n>j</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;-----------&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;i:</span><span class=si>{</span><span class=n>i</span><span class=si>}</span><span class=s1>   j:</span><span class=si>{</span><span class=n>j</span><span class=si>}</span><span class=s1>   mid:</span><span class=si>{</span><span class=n>mid</span><span class=si>}</span><span class=s1>   l:</span><span class=si>{</span><span class=n>l</span><span class=si>}</span><span class=s1>   r:</span><span class=si>{</span><span class=n>r</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># 此时其中一序列（如1,3,4）已经全部按顺序添加到temp中，另一序列还剩9,只需将剩下的添加到temp</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>i</span> <span class=o>&lt;=</span> <span class=n>mid</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>temp</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>arr</span><span class=p>[</span><span class=n>i</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>        <span class=n>i</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>j</span> <span class=o>&lt;=</span> <span class=n>r</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>temp</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>arr</span><span class=p>[</span><span class=n>j</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>        <span class=n>j</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>temp</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1># 此时子序列已排好序，直接将temp中排好序的元素赋给arr对应位置</span>
+</span></span><span class=line><span class=cl>    <span class=n>arr</span><span class=p>[</span><span class=n>l</span><span class=p>:</span> <span class=n>r</span> <span class=o>+</span> <span class=mi>1</span><span class=p>]</span> <span class=o>=</span> <span class=n>temp</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>arr</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>merge_sort</span><span class=p>(</span><span class=n>arr</span><span class=p>,</span> <span class=n>l</span><span class=p>,</span> <span class=n>r</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>l</span> <span class=o>&lt;</span> <span class=n>r</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>mid</span> <span class=o>=</span> <span class=p>(</span><span class=n>l</span><span class=o>+</span><span class=n>r</span><span class=p>)</span> <span class=o>//</span> <span class=mi>2</span>
+</span></span><span class=line><span class=cl>        <span class=n>merge_sort</span><span class=p>(</span><span class=n>arr</span><span class=p>,</span> <span class=n>l</span><span class=p>,</span> <span class=n>mid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>merge_sort</span><span class=p>(</span><span class=n>arr</span><span class=p>,</span> <span class=n>mid</span><span class=o>+</span><span class=mi>1</span><span class=p>,</span> <span class=n>r</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>merge</span><span class=p>(</span><span class=n>arr</span><span class=p>,</span> <span class=n>l</span><span class=p>,</span> <span class=n>r</span><span class=p>,</span> <span class=n>mid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>arr</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=基础><a href=#%e5%9f%ba%e7%a1%80 class=header-anchor></a>基础</h4><h5 id=查找第一个不重复的字符><a href=#%e6%9f%a5%e6%89%be%e7%ac%ac%e4%b8%80%e4%b8%aa%e4%b8%8d%e9%87%8d%e5%a4%8d%e7%9a%84%e5%ad%97%e7%ac%a6 class=header-anchor></a>查找第一个不重复的字符</h5><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>first_char</span><span class=p>(</span><span class=n>arr</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>d</span> <span class=o>=</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;记录每个字符的出现次数&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span><span class=p>,</span> <span class=n>v</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>arr</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>v</span> <span class=ow>in</span> <span class=n>d</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>d</span><span class=p>[</span><span class=n>v</span><span class=p>]</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>d</span><span class=p>[</span><span class=n>v</span><span class=p>]</span> <span class=o>=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>d</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;再次遍历返回次数为1的元素&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span><span class=p>,</span> <span class=n>v</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>arr</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>d</span><span class=p>[</span><span class=n>v</span><span class=p>]</span> <span class=o>==</span> <span class=mi>1</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>v</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>first_char</span><span class=p>([</span><span class=s1>&#39;a&#39;</span><span class=p>,</span> <span class=s1>&#39;b&#39;</span><span class=p>,</span> <span class=s1>&#39;c&#39;</span><span class=p>,</span> <span class=s1>&#39;c&#39;</span><span class=p>,</span> <span class=s1>&#39;c&#39;</span><span class=p>,</span> <span class=s1>&#39;d&#39;</span><span class=p>,</span> <span class=s1>&#39;e&#39;</span><span class=p>,</span> <span class=s1>&#39;f&#39;</span><span class=p>,</span> <span class=s1>&#39;a&#39;</span><span class=p>]))</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=动态规划><a href=#%e5%8a%a8%e6%80%81%e8%a7%84%e5%88%92 class=header-anchor></a>动态规划</h4><h5 id=01背包问题><a href=#01%e8%83%8c%e5%8c%85%e9%97%ae%e9%a2%98 class=header-anchor></a>01背包问题</h5><p>从n个物品中选取一些物品（物品下标为i，背包容量为j），使得容量为s的背包包含的物品总价值最大。</p><pre class=mermaid style=visibility:hidden>graph LR
+	A[情形]-->装不下-->前i个和前i-1个物品的总价值最佳组合相同;
+	A-->B[装得下];
+	B-->|不装|前i个和前i-1个物品的总价值最佳组合一样;
+	B-->|装|总价值等于前i-1个物品的价值+当前物品的价值;
+	</pre><pre class=mermaid style=visibility:hidden>  graph LR
+	A(["dp[i][j] ="])-->|装不下|D(["dp[i-1][j]"]);
+	A-->|装得下|C(["max( dp[i-1][j-w[i]] + v[i], dp[i-1][j] )"]);</pre><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 使用滚动数组优化：</span>
+</span></span><span class=line><span class=cl><span class=c1># dp[j]表示容量为j的背包所装的最大价值</span>
+</span></span><span class=line><span class=cl><span class=n>dp</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=nb>max</span><span class=p>(</span><span class=n>dp</span><span class=p>[</span><span class=n>j</span><span class=p>],</span> <span class=n>dp</span><span class=p>[</span><span class=n>j</span><span class=o>-</span><span class=n>w</span><span class=p>[</span><span class=n>i</span><span class=p>]]</span><span class=o>+</span><span class=n>v</span><span class=p>[</span><span class=n>i</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>backpack</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 使用滚动数组dp[j]取代二维数组，表示容量为j的背包所装的最大价值</span>
+</span></span><span class=line><span class=cl>    <span class=n>w</span> <span class=o>=</span> <span class=p>[</span><span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>6</span><span class=p>,</span> <span class=mi>5</span><span class=p>]</span>  <span class=c1># 重量</span>
+</span></span><span class=line><span class=cl>    <span class=n>v</span> <span class=o>=</span> <span class=p>[</span><span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>6</span><span class=p>]</span>  <span class=c1># 价值</span>
+</span></span><span class=line><span class=cl>    <span class=n>s</span> <span class=o>=</span> <span class=mi>8</span>  <span class=c1># 最大承受重量</span>
+</span></span><span class=line><span class=cl>    <span class=n>n</span> <span class=o>=</span> <span class=nb>len</span><span class=p>(</span><span class=n>w</span><span class=p>)</span>    <span class=c1># 物品个数</span>
+</span></span><span class=line><span class=cl>    <span class=n>dp</span> <span class=o>=</span> <span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>*</span> <span class=p>(</span><span class=n>s</span><span class=o>+</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>obj_list</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>dp1</span> <span class=o>=</span> <span class=p>[[</span><span class=mi>0</span><span class=p>]</span><span class=o>*</span><span class=p>(</span><span class=n>s</span><span class=o>+</span><span class=mi>1</span><span class=p>)</span> <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>n</span><span class=o>+</span><span class=mi>1</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 二维数组方法</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=n>n</span><span class=o>+</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>j</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>s</span><span class=o>+</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=n>j</span> <span class=o>&gt;=</span> <span class=n>w</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>                <span class=n>dp1</span><span class=p>[</span><span class=n>i</span><span class=p>][</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=nb>max</span><span class=p>(</span><span class=n>dp1</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>][</span><span class=n>j</span><span class=p>],</span> <span class=n>dp1</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>][</span><span class=n>j</span><span class=o>-</span><span class=n>w</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>]]</span> <span class=o>+</span> <span class=n>v</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>dp1</span><span class=p>[</span><span class=n>i</span><span class=p>][</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=n>dp1</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>][</span><span class=n>j</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>dp1</span><span class=p>[</span><span class=o>-</span><span class=mi>1</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 一维滚动数组</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>n</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>j</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>s</span><span class=p>,</span> <span class=n>w</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>-</span><span class=mi>1</span><span class=p>,</span> <span class=o>-</span><span class=mi>1</span><span class=p>):</span>		<span class=c1># 倒序遍历背包</span>
+</span></span><span class=line><span class=cl>            <span class=n>dp</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=nb>max</span><span class=p>(</span><span class=n>dp</span><span class=p>[</span><span class=n>j</span><span class=p>],</span> <span class=n>dp</span><span class=p>[</span><span class=n>j</span><span class=o>-</span><span class=n>w</span><span class=p>[</span><span class=n>i</span><span class=p>]]</span> <span class=o>+</span> <span class=n>v</span><span class=p>[</span><span class=n>i</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>dp</span>
+</span></span></code></pre></td></tr></table></div></div><h5 id=礼物最大价值><a href=#%e7%a4%bc%e7%89%a9%e6%9c%80%e5%a4%a7%e4%bb%b7%e5%80%bc class=header-anchor></a>礼物最大价值</h5><blockquote><p>在一个 m*n 的棋盘的每一格都放有一个礼物，每个礼物都有一定的价值（价值大于 0）。你可以从棋盘的左上角开始拿格子里的礼物，并每次向右或者向下移动一格、直到到达棋盘的右下角。给定一个棋盘及其上面的礼物的价值，请计算你最多能拿到多少价值的礼物？</p><p>链接：https://leetcode.cn/problems/li-wu-de-zui-da-jie-zhi-lcof</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>maxValue</span><span class=p>(</span><span class=n>grid</span><span class=p>:</span> <span class=n>List</span><span class=p>[</span><span class=n>List</span><span class=p>[</span><span class=nb>int</span><span class=p>]])</span> <span class=o>-&gt;</span> <span class=nb>int</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>width</span> <span class=o>=</span> <span class=nb>len</span><span class=p>(</span><span class=n>grid</span><span class=p>[</span><span class=mi>0</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>height</span> <span class=o>=</span> <span class=nb>len</span><span class=p>(</span><span class=n>grid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>dp</span> <span class=o>=</span> <span class=p>[[</span><span class=mi>0</span><span class=p>]</span><span class=o>*</span><span class=p>(</span><span class=n>width</span><span class=o>+</span><span class=mi>1</span><span class=p>)</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>height</span><span class=o>+</span><span class=mi>1</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>    <span class=c1># 注意遍历顺序需要和i,j对应</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=n>height</span><span class=o>+</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>j</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=n>width</span><span class=o>+</span><span class=mi>1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>dp</span><span class=p>[</span><span class=n>i</span><span class=p>][</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=nb>max</span><span class=p>(</span><span class=n>dp</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>][</span><span class=n>j</span><span class=p>],</span> <span class=n>dp</span><span class=p>[</span><span class=n>i</span><span class=p>][</span><span class=n>j</span><span class=o>-</span><span class=mi>1</span><span class=p>])</span> <span class=o>+</span> <span class=n>grid</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>][</span><span class=n>j</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>dp</span><span class=p>[</span><span class=n>height</span><span class=p>][</span><span class=n>width</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>maxValue</span><span class=p>([[</span><span class=mi>1</span><span class=p>,</span><span class=mi>2</span><span class=p>,</span><span class=mi>5</span><span class=p>],[</span><span class=mi>3</span><span class=p>,</span><span class=mi>2</span><span class=p>,</span><span class=mi>1</span><span class=p>]])</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=滑动窗口><a href=#%e6%bb%91%e5%8a%a8%e7%aa%97%e5%8f%a3 class=header-anchor></a>滑动窗口</h4><blockquote><p>给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。返回滑动窗口中的最大值 。
+链接：https://leetcode.cn/problems/sliding-window-maximum</p><p>输入：nums = [1,3,-1,-3,5,3,6,7], k = 3
+输出：[3,3,5,5,6,7]
+解释：
+滑动窗口的位置 最大值</p><hr><p>[1 3 -1] -3 5 3 6 7 3
+1 [3 -1 -3] 5 3 6 7 3
+1 3 [-1 -3 5] 3 6 7 5
+1 3 -1 [-3 5 3] 6 7 5
+1 3 -1 -3 [5 3 6] 7 6
+1 3 -1 -3 5 [3 6 7] 7</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>maxSlidingWindow</span><span class=p>(</span><span class=n>nums</span><span class=p>:</span> <span class=n>List</span><span class=p>[</span><span class=nb>int</span><span class=p>],</span> <span class=n>k</span><span class=p>:</span> <span class=nb>int</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>List</span><span class=p>[</span><span class=nb>int</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 双端队列</span>
+</span></span><span class=line><span class=cl>    <span class=n>q</span> <span class=o>=</span> <span class=n>collections</span><span class=o>.</span><span class=n>deque</span>
+</span></span><span class=line><span class=cl>    <span class=n>res</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=n>nums</span><span class=p>)):</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 单调递减栈</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=n>q</span> <span class=ow>and</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&gt;=</span> <span class=n>nums</span><span class=p>[</span><span class=n>q</span><span class=p>[</span><span class=o>-</span><span class=mi>1</span><span class=p>]]:</span>
+</span></span><span class=line><span class=cl>            <span class=n>q</span><span class=o>.</span><span class=n>pop</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=n>q</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>i</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1># # 当队头元素超出窗口边界时，弹出队头元素</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=n>q</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>&lt;=</span> <span class=n>i</span><span class=o>-</span><span class=n>k</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>q</span><span class=o>.</span><span class=n>popleft</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>        <span class=c1># 从第二个窗口开始之后都要弹出队头元素，第一个窗口右边界k-1</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>i</span><span class=o>&gt;=</span><span class=n>k</span><span class=o>-</span><span class=mi>1</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>res</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>q</span><span class=p>[</span><span class=mi>0</span><span class=p>]])</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>res</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=数组和树形数据转换><a href=#%e6%95%b0%e7%bb%84%e5%92%8c%e6%a0%91%e5%bd%a2%e6%95%b0%e6%8d%ae%e8%bd%ac%e6%8d%a2 class=header-anchor></a>数组和树形数据转换</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>data</span> <span class=o>=</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span><span class=s1>&#39;id&#39;</span><span class=p>:</span> <span class=mi>1</span><span class=p>,</span> <span class=s1>&#39;pid&#39;</span><span class=p>:</span> <span class=mi>0</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span><span class=s1>&#39;id&#39;</span><span class=p>:</span> <span class=mi>2</span><span class=p>,</span> <span class=s1>&#39;pid&#39;</span><span class=p>:</span> <span class=mi>1</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span><span class=s1>&#39;id&#39;</span><span class=p>:</span> <span class=mi>7</span><span class=p>,</span> <span class=s1>&#39;pid&#39;</span><span class=p>:</span> <span class=mi>2</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span><span class=s1>&#39;id&#39;</span><span class=p>:</span> <span class=mi>8</span><span class=p>,</span> <span class=s1>&#39;pid&#39;</span><span class=p>:</span> <span class=mi>6</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li><p><strong>扁平数组树形化</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>list2Tree</span><span class=p>(</span><span class=n>data</span><span class=p>,</span> <span class=n>parent</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>  <span class=n>output</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> <span class=n>node</span> <span class=ow>in</span> <span class=n>data</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=n>node</span><span class=p>[</span><span class=s2>&#34;pid&#34;</span><span class=p>]</span> <span class=o>!=</span> <span class=n>parent</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>          <span class=k>continue</span>
+</span></span><span class=line><span class=cl>      <span class=n>children</span> <span class=o>=</span> <span class=n>list2Tree</span><span class=p>(</span><span class=n>data</span><span class=p>,</span> <span class=n>node</span><span class=p>[</span><span class=s2>&#34;id&#34;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>      <span class=n>node</span><span class=o>.</span><span class=n>update</span><span class=p>(</span><span class=n>children</span><span class=o>=</span><span class=n>children</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>      <span class=n>output</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>node</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=n>output</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p><strong>树形数据扁平化</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>flat_tree</span><span class=p>(</span><span class=n>data</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>  <span class=n>ret</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> <span class=n>item</span> <span class=ow>in</span> <span class=n>data</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>      <span class=n>ret</span><span class=o>.</span><span class=n>append</span><span class=p>({</span><span class=s2>&#34;id&#34;</span><span class=p>:</span> <span class=n>item</span><span class=p>[</span><span class=s2>&#34;id&#34;</span><span class=p>],</span> <span class=s2>&#34;pid&#34;</span><span class=p>:</span> <span class=n>item</span><span class=p>[</span><span class=s2>&#34;pid&#34;</span><span class=p>]})</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=n>item</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&#34;children&#34;</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>          <span class=n>ret</span><span class=o>.</span><span class=n>extend</span><span class=p>(</span><span class=n>flat_tree</span><span class=p>(</span><span class=n>item</span><span class=p>[</span><span class=s2>&#34;children&#34;</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=n>ret</span>
+</span></span></code></pre></td></tr></table></div></div></li></ul><h4 id=最大数字组合><a href=#%e6%9c%80%e5%a4%a7%e6%95%b0%e5%ad%97%e7%bb%84%e5%90%88 class=header-anchor></a>最大数字组合</h4><blockquote><p>有几个任意位数的正整数，求能组成的最大数字</p></blockquote><p>思路：<br>若 a+b > b+a，则a应该在前，否则a在后</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>functools</span> <span class=kn>import</span> <span class=n>cmp_to_key</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>max_number</span><span class=p>(</span><span class=n>nums</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 自定义比较函数</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>compare</span><span class=p>(</span><span class=n>x</span><span class=p>,</span> <span class=n>y</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=c1># 将两个字符串拼接起来进行比较</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>int</span><span class=p>(</span><span class=n>y</span> <span class=o>+</span> <span class=n>x</span><span class=p>)</span> <span class=o>-</span> <span class=nb>int</span><span class=p>(</span><span class=n>x</span> <span class=o>+</span> <span class=n>y</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 将正整数转换为字符串</span>
+</span></span><span class=line><span class=cl>    <span class=n>nums</span> <span class=o>=</span> <span class=p>[</span><span class=nb>str</span><span class=p>(</span><span class=n>num</span><span class=p>)</span> <span class=k>for</span> <span class=n>num</span> <span class=ow>in</span> <span class=n>nums</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 使用自定义的比较函数对字符串进行排序</span>
+</span></span><span class=line><span class=cl>    <span class=n>nums</span><span class=o>.</span><span class=n>sort</span><span class=p>(</span><span class=n>key</span><span class=o>=</span><span class=n>cmp_to_key</span><span class=p>(</span><span class=n>compare</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1># 将排序后的字符串连接起来得到最大数</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span> <span class=o>=</span> <span class=s1>&#39;&#39;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=n>nums</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>result</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=mysql><a href=#mysql class=header-anchor></a>MySQL</h2><h3 id=基础-1><a href=#%e5%9f%ba%e7%a1%80-1 class=header-anchor></a>基础</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-mysql data-lang=mysql><span class=line><span class=cl><span class=mi>1</span><span class=w> </span><span class=c1>#DISTINCT返回唯一不同的值
+</span></span></span><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=k>DISTINCT</span><span class=w> </span><span class=err>列名称</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=err>表名称</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=mi>2</span><span class=c1>#ORDER BY排序（DESC降序，ASC升序）
+</span></span></span><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>Company</span><span class=p>,</span><span class=w> </span><span class=n>OrderNumber</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>Orders</span><span class=w> </span><span class=k>ORDER</span><span class=w> </span><span class=k>BY</span><span class=w> </span><span class=n>Company</span><span class=w> </span><span class=k>DESC</span><span class=p>,</span><span class=w> </span><span class=n>OrderNumber</span><span class=w> </span><span class=k>ASC</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=mi>3</span><span class=c1># IFNULL如果第一个参数 为 NULL，则返回第二个参数的备用值
+</span></span></span><span class=line><span class=cl><span class=nf>IFNULL</span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>       </span><span class=p>(</span><span class=k>SELECT</span><span class=w> </span><span class=k>DISTINCT</span><span class=w> </span><span class=n>Salary</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>       </span><span class=k>FROM</span><span class=w> </span><span class=n>Employee</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>       </span><span class=k>ORDER</span><span class=w> </span><span class=k>BY</span><span class=w> </span><span class=n>Salary</span><span class=w> </span><span class=k>DESC</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>       </span><span class=k>LIMIT</span><span class=w> </span><span class=mi>2</span><span class=w> </span><span class=n>OFFSET</span><span class=w> </span><span class=mi>1</span><span class=p>),</span><span class=w>	</span><span class=c1>#返回从第三行开始，共1行数据
+</span></span></span><span class=line><span class=cl><span class=w>       </span><span class=no>NULL</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=mi>4</span><span class=w> </span><span class=c1>#join内连接，和inner join效果一样
+</span></span></span><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>a</span><span class=p>.</span><span class=n>NAME</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=n>Employee</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=n>Employee</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=n>a</span><span class=w> </span><span class=k>JOIN</span><span class=w> </span><span class=n>Employee</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=n>b</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>     </span><span class=k>ON</span><span class=w> </span><span class=n>a</span><span class=p>.</span><span class=n>ManagerId</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>b</span><span class=p>.</span><span class=n>Id</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>     </span><span class=k>AND</span><span class=w> </span><span class=n>a</span><span class=p>.</span><span class=n>Salary</span><span class=w> </span><span class=o>&gt;</span><span class=w> </span><span class=n>b</span><span class=p>.</span><span class=n>Salary</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>     
+</span></span></span><span class=line><span class=cl><span class=mi>5</span><span class=c1># Dense_RANK() over对成绩排名，RANK() over排名时若有并列将占用下一位的位置
+</span></span></span><span class=line><span class=cl><span class=k>select</span><span class=w> </span><span class=n>Score</span><span class=p>,</span><span class=nf>Dense_RANK</span><span class=p>()</span><span class=w> </span><span class=nf>over</span><span class=w> </span><span class=p>(</span><span class=k>order</span><span class=w> </span><span class=k>by</span><span class=w> </span><span class=n>Score</span><span class=w> </span><span class=k>desc</span><span class=p>)</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=o>`</span><span class=n>Rank</span><span class=o>`</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>from</span><span class=w> </span><span class=n>Scores</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>   
+</span></span></span><span class=line><span class=cl><span class=mi>6</span><span class=w> </span><span class=c1>#顺序：where——group by——having，注意group by紧跟在where最后一个限制条件后面，不能被夹在where限制条件之间。使用了having必须使用group by，但是使用group by 不一定使用having
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=mi>7</span><span class=w> </span><span class=c1>#IF(condition, value_if_true, value_if_false)
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=mi>8</span><span class=c1>#回购率：某一个时间窗口内消费的用户，在下一个时间窗口仍旧消费的占比
+</span></span></span><span class=line><span class=cl><span class=w> </span><span class=c1>#复购率：在某时间窗口内重复消费用户（消费两次及以上的用户）在总消费用户中占比
+</span></span></span></code></pre></td></tr></table></div></div><p><img alt=image-20210215213701733 class=gallery-image data-flex-basis=431px data-flex-grow=179 height=422 loading=lazy sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src=/p/leetcode/image-20210215213701733_hu_c8e131a45e46c50b.png width=759></p><h3 id=次日留存率><a href=#%e6%ac%a1%e6%97%a5%e7%95%99%e5%ad%98%e7%8e%87 class=header-anchor></a>次日留存率</h3><p>#查看用户在某天刷题后第二天还会再来刷题的平均概率。</p><p><img alt=image-20220219161533073 class=gallery-image data-flex-basis=348px data-flex-grow=145 height=644 loading=lazy sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src=/p/leetcode/image-20220219161533073_hu_b8a6c39e464326b0.png srcset="/p/leetcode/image-20220219161533073_hu_bbbc7d0972d7a09a.png 800w, /p/leetcode/image-20220219161533073_hu_b8a6c39e464326b0.png 936w" width=936></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-mysql data-lang=mysql><span class=line><span class=cl><span class=c1>#先对用户去重，然后自连接，q1显示所有，q2显示留存
+</span></span></span><span class=line><span class=cl><span class=k>select</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nf>count</span><span class=p>(</span><span class=n>q2</span><span class=p>.</span><span class=n>device_id</span><span class=p>)</span><span class=o>/</span><span class=nf>count</span><span class=p>(</span><span class=n>q1</span><span class=p>.</span><span class=n>device_id</span><span class=p>)</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=n>avg_ret</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>from</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>(</span><span class=k>select</span><span class=w> </span><span class=k>distinct</span><span class=w> </span><span class=n>device_id</span><span class=p>,</span><span class=w> </span><span class=kt>date</span><span class=w> </span><span class=k>from</span><span class=w> </span><span class=n>question_practice_detail</span><span class=p>)</span><span class=w> </span><span class=n>q1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>left</span><span class=w> </span><span class=k>join</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>(</span><span class=k>select</span><span class=w> </span><span class=k>distinct</span><span class=w> </span><span class=n>device_id</span><span class=p>,</span><span class=w> </span><span class=kt>date</span><span class=w> </span><span class=k>from</span><span class=w> </span><span class=n>question_practice_detail</span><span class=p>)</span><span class=w> </span><span class=n>q2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>on</span><span class=w> </span><span class=n>q1</span><span class=p>.</span><span class=n>device_id</span><span class=o>=</span><span class=n>q2</span><span class=p>.</span><span class=n>device_id</span><span class=w> </span><span class=k>and</span><span class=w> </span><span class=n>q2</span><span class=p>.</span><span class=kt>date</span><span class=o>=</span><span class=nf>date_add</span><span class=p>(</span><span class=n>q1</span><span class=p>.</span><span class=kt>date</span><span class=p>,</span><span class=k>interval</span><span class=w> </span><span class=mi>1</span><span class=w> </span><span class=n>day</span><span class=p>)</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></section><footer class="article-meta article-footer"><section class=article-tags><a href=/tags/%E6%9F%A5%E6%89%BE/>查找</a>
+<a href=/tags/%E6%8E%92%E5%BA%8F/>排序</a>
+<a href=/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/>动态规划</a></section></footer><nav class=article-prevnext aria-label=相邻文章><a class="article-prevnext__item article-prevnext__item--older" href=/p/design-patterns/ rel=prev><span class=article-prevnext__label><svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+<span>上一篇</span>
+</span><span class=article-prevnext__title>设计模式</span>
+<span class=article-prevnext__date>2022.11.06</span>
+</a><a class="article-prevnext__item article-prevnext__item--newer" href=/p/python-asyncio/ rel=next><span class=article-prevnext__label><span>下一篇</span>
+<svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+</span><span class=article-prevnext__title>Python Asyncio</span>
+<span class=article-prevnext__date>2023.01.07</span></a></nav></article><script type=module>
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script><div class=mermaid-modal id=mermaid-modal><div class=mermaid-modal-header><div class=mermaid-modal-controls><button data-zoom=-1>− Zoom Out</button>
+<button data-zoom=0>Reset (100%)</button>
+<button data-zoom=1>+ Zoom In</button>
+<button data-zoom=fit>Fit to Screen</button></div><button class=mermaid-modal-close id=mermaid-modal-close>✕ Close (Esc)</button></div><div class=mermaid-modal-body id=mermaid-modal-body><div class=mermaid-modal-content id=mermaid-modal-content></div></div></div><script src=https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js></script><script type=module>
+import { initMermaidPage } from '\/ts\/mermaid.js';
+initMermaidPage({"darkTheme":"dark","darkThemeVariables":{},"htmlLabels":true,"lightTheme":"default","lightThemeVariables":{},"look":"classic","securityLevel":"strict","transparentBackground":false});
+</script></main><footer class=site-footer><div class=site-footer__inner><div class=site-footer__cta><h2>有想法？<br><span>我们聊聊。</span></h2><a class=site-footer__email href=mailto:yuqiuwen2020@gmail.com>yuqiuwen2020@gmail.com ↗</a></div><div class=site-footer__bottom><span>© 2026 Yu Qiuwen</span><div class=site-footer__social><a href=mailto:yuqiuwen2020@gmail.com><svg class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg>
+<span>Email</span>
+</a><a href=https://github.com/yuqiuwen target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+<span>GitHub</span>
+</a><a href=/index.xml target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="5" cy="19" r="1"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg>
+<span>RSS</span></a></div></div></div></footer><script src=/js/gate.min.2d3ffea2c40fd0275c673de6c9daa61d0491889ed40ec7f56751951b9d0022f0.js integrity="sha256-LT/+osQP0CdcZz3mydqmHQSRiJ7UDsf1Z1GVG50AIvA=" defer></script><script type=text/javascript src=/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js defer></script></body></html>

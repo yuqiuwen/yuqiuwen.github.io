@@ -1,0 +1,697 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="PostgreSQL 与 Redis 实战笔记"><title>数据库</title><link rel=canonical href=https://yuqiuwen.github.io/p/database/><link rel=stylesheet href=/scss/style.min.4a914355c20926e8bdfe68714ac712c1fb2dc8c1d4ed7f5d9abd9d186f48784e.css><meta property='og:title' content="数据库"><meta property='og:description' content="PostgreSQL 与 Redis 实战笔记"><meta property='og:url' content='https://yuqiuwen.github.io/p/database/'><meta property='og:site_name' content='yuqiuwen'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='数据库'><meta property='article:tag' content='MySQL'><meta property='article:tag' content='redis'><meta property='article:published_time' content='2023-07-11T00:00:00+00:00'><meta property='article:modified_time' content='2023-07-11T00:00:00+00:00'><meta name=twitter:title content="数据库"><meta name=twitter:description content="PostgreSQL 与 Redis 实战笔记"><link rel="shortcut icon" href=/img/favicon_hu_c31a0c718cbb325a.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"dark")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-nav><div class=site-nav__inner><a class=site-logo href=/>Yu.<span>QW</span></a><nav class=site-nav__links aria-label=主导航><a href=/>首页</a><a href=/projects/>作品集</a><a href=/post/ class=is-active aria-current=page>博客</a><a href=/food/>美食</a><a href=/about/>关于我</a><a href=/archives/>归档</a><a href=/search/>搜索</a></nav><button class=scheme-toggle id=dark-mode-toggle type=button aria-label="切换深色 / 浅色">
+<svg class="scheme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2m0 14.8v2.2M4.2 12H2m20 0h-2.2M6.2 6.2 4.7 4.7M19.3 19.3l-1.5-1.5m0-11.6 1.5-1.5M4.7 19.3l1.5-1.5"/></svg>
+<svg class="scheme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6.0 019.4 3.5a8.6 8.6.0 1011.1 11.1z"/></svg></button></div></header><main class=site-main><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E6%9C%AF/ style=background-color:#beefd9;color:#0f3d29>技术</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/database/>数据库</a></h2><h3 class=article-subtitle>PostgreSQL 与 Redis 实战笔记</h3></div><footer class=article-meta><div class=inline-meta><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2023-07-11T00:00:00Z>2023 年 7 月 11 日</time>
+<svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 15 分钟</time></div></footer></div></header><aside class=article-toc><details><summary><div class=article-toc-title><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目录</span></div></summary><nav class=toc-nav id=TableOfContents><ol><li><a href=#数据库设置>数据库设置</a></li><li><a href=#数据库设计规范>数据库设计规范</a><ol><li><a href=#主键设计>主键设计</a></li><li><a href=#索引>索引</a></li><li><a href=#逻辑删除>逻辑删除</a></li><li><a href=#json-和-jsonb>json 和 jsonb</a></li><li><a href=#多对多>多对多</a></li><li><a href=#如何保证幂等性>如何保证幂等性</a></li></ol></li><li><a href=#数据库操作>数据库操作</a><ol><li><a href=#查询>查询</a></li><li><a href=#更新>更新</a><ol><li><a href=#批量更新>批量更新</a></li></ol></li><li><a href=#删除>删除</a></li><li><a href=#分区>分区</a></li><li><a href=#窗口函数>窗口函数</a></li><li><a href=#统计表的大小>统计表的大小</a></li><li><a href=#统计数据库的大小>统计数据库的大小</a></li><li><a href=#补充使用-l-和-dt-命令>补充：使用 <code>\l+</code> 和 <code>\dt+</code> 命令</a></li></ol></li><li><a href=#数据库备份>数据库备份</a></li><li><a href=#redis>Redis</a><ol><li><a href=#配置>配置</a></li><li><a href=#持久化策略>持久化策略</a></li><li><a href=#关键说明>关键说明</a></li><li><a href=#配置示例>配置示例</a></li><li><a href=#如何保证数据一致性>如何保证数据一致性？</a></li><li><a href=#redis-分布式锁>Redis 分布式锁</a></li><li><a href=#缓存击穿--缓存血崩>缓存击穿 & 缓存血崩</a></li><li><a href=#应用>应用</a><ol><li><a href=#hyperloglog-统计-uv>HyperLogLog 统计 UV</a></li><li><a href=#incr-文章浏览量计数>incr 文章浏览量计数</a></li><li><a href=#bitmap-位图>bitmap 位图</a></li><li><a href=#scan-扫描匹配的所有键>scan 扫描匹配的所有键</a></li></ol></li></ol></li><li><a href=#其他>其他</a><ol><li><a href=#实现数据表格拖拽排序>实现数据表格拖拽排序</a></li><li><a href=#分页查询>分页查询</a><ol><li><a href=#redis-zset-分页>Redis zset 分页</a></li></ol></li><li><a href=#游客模式>游客模式</a></li></ol></li></ol></nav></details></aside><section class=article-content><p><img class=gallery-image data-flex-basis=205px data-flex-grow=85 height=3477 loading=lazy sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src=/p/database/sql-query-execution-order_hu_4ac0a009dc209a92.png srcset="/p/database/sql-query-execution-order_hu_bec79b4e5696986.png 800w, /p/database/sql-query-execution-order_hu_ba056deb5d7e7a01.png 1600w, /p/database/sql-query-execution-order_hu_d89d111361638123.png 2400w, /p/database/sql-query-execution-order_hu_4ac0a009dc209a92.png 2982w" width=2982></p><h2 id=数据库设置><a href=#%e6%95%b0%e6%8d%ae%e5%ba%93%e8%ae%be%e7%bd%ae class=header-anchor></a>数据库设置</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 连接 pgsql 并创建数据库</span>
+</span></span><span class=line><span class=cl>psql -h localhost -U username -W -c <span class=s2>&#34;CREATE DATABASE game_community_admin&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 连接某一个数据库</span>
+</span></span><span class=line><span class=cl>psql -h 172.16.6.41 -p <span class=m>5432</span> -U postgres -d game_community_admin -W
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查询当前数据库连接数，datname：数据库名称</span>
+</span></span><span class=line><span class=cl>SELECT pid, usename, application_name, state, count<span class=o>(</span>*<span class=o>)</span> FROM pg_stat_activity WHERE <span class=nv>datname</span> <span class=o>=</span> <span class=s1>&#39;game_community_admin&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 释放当前数据库全部连接，才能删库</span>
+</span></span><span class=line><span class=cl>SELECT pg_terminate_backend<span class=o>(</span>pid<span class=o>)</span> FROM pg_stat_activity WHERE <span class=nv>datname</span> <span class=o>=</span> <span class=s1>&#39;game_community_admin&#39;</span> AND pid&lt;&gt;pg_backend_pid<span class=o>()</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=se>\l</span>	<span class=c1># 查看所有库</span>
+</span></span><span class=line><span class=cl><span class=se>\x</span>	<span class=c1># 扩展显示</span>
+</span></span><span class=line><span class=cl><span class=se>\c</span> &lt;database&gt;		<span class=c1># 切换数据库</span>
+</span></span><span class=line><span class=cl><span class=se>\q</span>	<span class=c1># 退出 sql 命令行</span>
+</span></span><span class=line><span class=cl><span class=se>\d</span>t	<span class=c1># 查看此数据库下所有表</span>
+</span></span><span class=line><span class=cl><span class=se>\d</span> &lt;tablename&gt;	<span class=c1># 查看表结构</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=数据库设计规范><a href=#%e6%95%b0%e6%8d%ae%e5%ba%93%e8%ae%be%e8%ae%a1%e8%a7%84%e8%8c%83 class=header-anchor></a>数据库设计规范</h2><h3 id=主键设计><a href=#%e4%b8%bb%e9%94%ae%e8%ae%be%e8%ae%a1 class=header-anchor></a>主键设计</h3><ul><li>自增主键</li><li>uuid</li><li>ulid</li><li>雪花算法</li><li>根据业务规则自定义生成，比如：<code>userID + timestamp + randomNumber</code></li></ul><p><strong>雪花算法由 64bit 数字组成</strong></p><ul><li>1-bit 不用于生成 ID（符号位）</li><li>41-bit 当前时间戳（毫秒）- 指定时间的差值，可以表示 <code>1 x 2^41 / (1000 x 3600 x 24 x 365) = 69</code> 年的时间</li><li>10-bit 可以分别表示 <code>1 x 2^10 = 1024</code> 台机器节点，范围 <code>[0,1023]</code>；可以拆分为 5 位数据中心 id + 5 位工作节点 id</li><li>12-bit 表示 1ms 内自动递增的序列号，<code>1 x 2^12 = 4096</code> 个，范围 <code>[0,4095]</code>。单机 1ms 可以生成 4096 个不重复的 ID</li></ul><p><strong>ulid 和 uuid 的对比</strong></p><div class=table-wrapper><table><thead><tr><th>uuid</th><th>ulid</th></tr></thead><tbody><tr><td>128bit</td><td>128bit</td></tr><tr><td>36 个字符</td><td>26 个字符（前 10 个字符为时间戳，后 16 个为随机数）</td></tr><tr><td>随机数（v4）</td><td>按词典排序，但不保证同一毫秒内有序</td></tr><tr><td></td><td>无特殊字符（url 安全）</td></tr></tbody></table></div><p>pgsql 主键：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=k>ROLE</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c1>-- GENERATED BY DEFAULT AS IDENTITY(START 20000000) 指定起始值
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=n>id</span><span class=w> </span><span class=nb>INT</span><span class=w> </span><span class=k>PRIMARY</span><span class=w> </span><span class=k>KEY</span><span class=w> </span><span class=k>GENERATED</span><span class=w> </span><span class=n>ALWAYS</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=k>IDENTITY</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;id&#34;</span><span class=w> </span><span class=nb>serial</span><span class=w> </span><span class=k>PRIMARY</span><span class=w> </span><span class=k>KEY</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=索引><a href=#%e7%b4%a2%e5%bc%95 class=header-anchor></a>索引</h3><p><strong>索引命名规范</strong></p><div class=table-wrapper><table><thead><tr><th>命名</th><th>含义</th></tr></thead><tbody><tr><td><code>uk_&lt;table>_&lt;column></code></td><td>唯一索引</td></tr><tr><td><code>uc_&lt;table>_&lt;column1>_&lt;column2></code></td><td>联合唯一索引</td></tr><tr><td><code>ix_&lt;table>_&lt;column></code></td><td>普通单列索引</td></tr><tr><td><code>ix_&lt;table>_&lt;column1>_&lt;column2></code></td><td>联合索引</td></tr></tbody></table></div><p><strong>回表</strong></p><p><code>users</code> 包含以下列：id（主键）、name、age。</p><p>创建了一个以 <code>name</code> 列为索引的非聚集索引，现在执行查询 <code>SELECT name, age FROM users WHERE name = 'John'</code>。</p><p>由于 age 不在索引中，查询时需要先通过 name 查询出主键 id，然后在主键 id 的索引树中找到 age 的数据。</p><p>如何解决回表？</p><ul><li><strong>聚集索引</strong></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>name</span><span class=p>,</span><span class=w> </span><span class=n>age</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>users</span><span class=w> </span><span class=k>WHERE</span><span class=w> </span><span class=n>id</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=mi>1</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li><strong>覆盖索引</strong></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=o>#</span><span class=w> </span><span class=err>创建覆盖索引</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>CREATE</span><span class=w> </span><span class=k>INDEX</span><span class=w> </span><span class=n>idx_name_age</span><span class=w> </span><span class=k>ON</span><span class=w> </span><span class=n>students</span><span class=w> </span><span class=p>(</span><span class=n>name</span><span class=p>,</span><span class=w> </span><span class=n>age</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=o>#</span><span class=w> </span><span class=err>查询语句，利用覆盖索引</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>name</span><span class=p>,</span><span class=w> </span><span class=n>age</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>users</span><span class=w> </span><span class=k>WHERE</span><span class=w> </span><span class=n>name</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=s1>&#39;John&#39;</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=逻辑删除><a href=#%e9%80%bb%e8%be%91%e5%88%a0%e9%99%a4 class=header-anchor></a>逻辑删除</h3><p>如何解决唯一性约束和 <code>is_delete</code> 冲突的问题？</p><p>在存在唯一索引的表中添加一个 <code>delete_id</code> 字段，默认为 -1，删除此条记录时，将 <code>is_delete</code> 设为 true，同时 <code>delete_id</code> 设为当前行的主键 id。</p><p>假如要求 username 字段唯一，则设置 <code>username</code> 和 <code>delete_id</code> 为联合唯一索引。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>User</span><span class=p>(</span><span class=n>BaseModel</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>__tablename__</span> <span class=o>=</span> <span class=s1>&#39;user&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>username</span> <span class=o>=</span> <span class=n>db</span><span class=o>.</span><span class=n>Column</span><span class=p>(</span><span class=n>db</span><span class=o>.</span><span class=n>string</span><span class=p>(</span><span class=mi>64</span><span class=p>),</span> <span class=n>nullable</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>index</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>org_id</span> <span class=o>=</span> <span class=n>db</span><span class=o>.</span><span class=n>Column</span><span class=p>(</span><span class=n>db</span><span class=o>.</span><span class=n>SMALLINT</span><span class=p>,</span> <span class=n>nullable</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>comment</span><span class=o>=</span><span class=s1>&#39;组织id&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>delete_id</span> <span class=o>=</span> <span class=n>db</span><span class=o>.</span><span class=n>Column</span><span class=p>(</span><span class=n>db</span><span class=o>.</span><span class=n>INTEGER</span><span class=p>,</span> <span class=n>nullable</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span> <span class=n>default</span><span class=o>=</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>__table_args__</span> <span class=o>=</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>db</span><span class=o>.</span><span class=n>UniqueConstraint</span><span class=p>(</span><span class=s1>&#39;username&#39;</span><span class=p>,</span> <span class=s1>&#39;delete_id&#39;</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=s1>&#39;_username_delete_id_uc&#39;</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=json-和-jsonb><a href=#json-%e5%92%8c-jsonb class=header-anchor></a>json 和 jsonb</h3><p><strong>区别：</strong></p><ul><li>json 写入快，读取慢</li><li>jsonb 写入慢，读取快（jsonb 以二进制形式存储已解析好的数据）</li></ul><p>JSONB 类型字段进行索引时，建议使用 GIN 索引。因为 GIN 索引适用于全文搜索和值匹配，可以更快地查询到符合条件的数据。而 BTree 索引只适用于比较操作和值匹配，对 JSONB 类型字段的查询效率可能会较低。</p><h3 id=多对多><a href=#%e5%a4%9a%e5%af%b9%e5%a4%9a class=header-anchor></a>多对多</h3><p><strong>sqlalchemy 语法</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>user_roles</span> <span class=o>=</span> <span class=n>db</span><span class=o>.</span><span class=n>Table</span><span class=p>(</span><span class=s1>&#39;sys_user_role&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>db</span><span class=o>.</span><span class=n>Column</span><span class=p>(</span><span class=s1>&#39;id&#39;</span><span class=p>,</span> <span class=n>db</span><span class=o>.</span><span class=n>Integer</span><span class=p>,</span> <span class=n>primary_key</span><span class=o>=</span><span class=kc>True</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=n>db</span><span class=o>.</span><span class=n>Column</span><span class=p>(</span><span class=s1>&#39;user_id&#39;</span><span class=p>,</span> <span class=n>db</span><span class=o>.</span><span class=n>Integer</span><span class=p>,</span> <span class=n>nullable</span><span class=o>=</span><span class=kc>False</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=n>db</span><span class=o>.</span><span class=n>Column</span><span class=p>(</span><span class=s1>&#39;role_id&#39;</span><span class=p>,</span> <span class=n>db</span><span class=o>.</span><span class=n>Integer</span><span class=p>,</span> <span class=n>nullable</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>set_user_role</span><span class=p>(</span><span class=n>user</span><span class=p>,</span> <span class=n>args</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>stmt</span> <span class=o>=</span> <span class=n>user_roles</span><span class=o>.</span><span class=n>insert</span><span class=p>()</span><span class=o>.</span><span class=n>values</span><span class=p>(</span><span class=o>**</span><span class=n>args</span><span class=p>)</span><span class=o>.</span><span class=n>returning</span><span class=p>(</span><span class=n>user_roles</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>ret</span> <span class=o>=</span> <span class=n>db</span><span class=o>.</span><span class=n>session</span><span class=o>.</span><span class=n>execute</span><span class=p>(</span><span class=n>stmt</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>ret</span> <span class=o>=</span> <span class=n>ret</span><span class=o>.</span><span class=n>mappings</span><span class=p>()</span><span class=o>.</span><span class=n>one_or_none</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>db</span><span class=o>.</span><span class=n>session</span><span class=o>.</span><span class=n>commit</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=如何保证幂等性><a href=#%e5%a6%82%e4%bd%95%e4%bf%9d%e8%af%81%e5%b9%82%e7%ad%89%e6%80%a7 class=header-anchor></a>如何保证幂等性</h3><ul><li><strong>乐观锁</strong> —— 表中增加一个 <code>version</code> 字段，每次处理完业务后更新 version</li><li><strong>唯一索引</strong> —— 防止 post 插入脏数据</li></ul><h2 id=数据库操作><a href=#%e6%95%b0%e6%8d%ae%e5%ba%93%e6%93%8d%e4%bd%9c class=header-anchor></a>数据库操作</h2><h3 id=查询><a href=#%e6%9f%a5%e8%af%a2 class=header-anchor></a>查询</h3><p><strong>条件写在 on 和 where 的区别</strong></p><ul><li>对于 inner join：结果无区别</li><li>对于 left outer join：返回左表全部数据，右表若不满足 on 中的条件，返回 null</li><li>right outer join 同理</li></ul><p><strong>查询 json 字段类型中的某个属性</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=o>-</span><span class=w> </span><span class=err>查询表</span><span class=w> </span><span class=n>arguments</span><span class=w> </span><span class=err>字段中的</span><span class=w> </span><span class=n>name</span><span class=w> </span><span class=err>属性</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>arguments</span><span class=o>-&gt;&gt;</span><span class=s1>&#39;name&#39;</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>table1</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=o>-</span><span class=w> </span><span class=err>查询</span><span class=w> </span><span class=n>arguments</span><span class=w> </span><span class=err>字段中的</span><span class=w> </span><span class=n>name</span><span class=w> </span><span class=err>属性，其中</span><span class=w> </span><span class=n>arguments</span><span class=w> </span><span class=err>值为数组嵌套字典格式，如</span><span class=w> </span><span class=p>[</span><span class=err>{}</span><span class=p>,</span><span class=w> </span><span class=err>{}</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>select</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=k>from</span><span class=w> </span><span class=n>table1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>where</span><span class=w> </span><span class=k>exists</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>(</span><span class=k>select</span><span class=w> </span><span class=mi>1</span><span class=w> </span><span class=k>from</span><span class=w> </span><span class=n>jsonb_array_elements</span><span class=p>(</span><span class=n>arguments</span><span class=p>)</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=n>nested_data</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>   </span><span class=k>where</span><span class=w> </span><span class=n>nested_data</span><span class=o>-&gt;&gt;</span><span class=s1>&#39;name&#39;</span><span class=w> </span><span class=k>like</span><span class=w> </span><span class=s1>&#39;%原游戏%&#39;</span><span class=p>);</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p><strong>深分页</strong></p><p>查询的页数过大时会出现深分页问题，比如查询 limit 10000 offset 20，则需要查出前 100020 条然后切片截取后 20 条。</p><p>解决办法：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>title</span><span class=p>,</span><span class=w> </span><span class=n>content</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=n>post</span><span class=w> </span><span class=n>a</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>JOIN</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>(</span><span class=k>SELECT</span><span class=w> </span><span class=n>id</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>post</span><span class=w> </span><span class=k>ORDER</span><span class=w> </span><span class=k>BY</span><span class=w> </span><span class=n>title</span><span class=w> </span><span class=k>LIMIT</span><span class=w> </span><span class=mi>10000</span><span class=p>,</span><span class=w> </span><span class=mi>20</span><span class=p>)</span><span class=w> </span><span class=n>b</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>ON</span><span class=w> </span><span class=n>a</span><span class=p>.</span><span class=n>id</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>b</span><span class=p>.</span><span class=n>id</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p><strong>判断区间是否重叠</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=o>*</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=n>fx_sharing_cp</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>WHERE</span><span class=w> </span><span class=n>daterange</span><span class=p>(</span><span class=n>start_dt</span><span class=p>,</span><span class=w> </span><span class=n>end_dt</span><span class=p>,</span><span class=w> </span><span class=s1>&#39;[]&#39;</span><span class=p>)</span><span class=w> </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=n>daterange</span><span class=p>(</span><span class=s1>&#39;2023-12-21&#39;</span><span class=p>,</span><span class=w> </span><span class=s1>&#39;2023-12-22&#39;</span><span class=p>,</span><span class=w> </span><span class=s1>&#39;[]&#39;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>-- 为了保证高并发场景下数据不一致的问题，读和写最好用一条 sql 语句实现
+</span></span></span><span class=line><span class=cl><span class=k>WITH</span><span class=w> </span><span class=n>overlap_check</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=k>SELECT</span><span class=w> </span><span class=o>*</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=k>FROM</span><span class=w> </span><span class=n>fx_sharing_cp</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=k>WHERE</span><span class=w> </span><span class=n>daterange</span><span class=p>(</span><span class=n>start_dt</span><span class=p>,</span><span class=w> </span><span class=n>end_dt</span><span class=p>,</span><span class=w> </span><span class=s1>&#39;[]&#39;</span><span class=p>)</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=o>&amp;&amp;</span><span class=w> </span><span class=n>daterange</span><span class=p>(</span><span class=s1>&#39;2023-12-21&#39;</span><span class=p>,</span><span class=w> </span><span class=s1>&#39;2023-12-22&#39;</span><span class=p>,</span><span class=w> </span><span class=s1>&#39;[]&#39;</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>INSERT</span><span class=w> </span><span class=k>INTO</span><span class=w> </span><span class=n>fx_sharing_cp</span><span class=w> </span><span class=p>(</span><span class=n>org_id</span><span class=p>,</span><span class=w> </span><span class=n>game_id</span><span class=p>,</span><span class=w> </span><span class=n>pattern</span><span class=p>,</span><span class=w> </span><span class=n>start_dt</span><span class=p>,</span><span class=w> </span><span class=n>end_dt</span><span class=p>,</span><span class=w> </span><span class=n>create_by</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=s1>&#39;2023-12-21&#39;</span><span class=p>,</span><span class=w> </span><span class=s1>&#39;2023-12-22&#39;</span><span class=p>,</span><span class=w> </span><span class=mi>0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>WHERE</span><span class=w> </span><span class=p>(</span><span class=k>SELECT</span><span class=w> </span><span class=k>COUNT</span><span class=p>(</span><span class=o>*</span><span class=p>)</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>overlap_check</span><span class=p>)</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=mi>0</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p><strong>分组聚合</strong></p><p><code>GROUPING SETS</code> 按不同维度汇总</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>SELECT</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>tj_date</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>game_id</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>chl_id</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>plat</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=k>SUM</span><span class=p>(</span><span class=n>role_numb</span><span class=p>)</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=n>role_numb</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=k>SUM</span><span class=p>(</span><span class=n>reg_numb</span><span class=p>)</span><span class=w>  </span><span class=k>AS</span><span class=w> </span><span class=n>reg_numb</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>business_day</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>WHERE</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=n>game_id</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=mi>2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>GROUP</span><span class=w> </span><span class=k>BY</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=k>GROUPING</span><span class=w> </span><span class=k>SETS</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>(</span><span class=n>tj_date</span><span class=p>,</span><span class=w> </span><span class=n>game_id</span><span class=p>),</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>(</span><span class=n>tj_date</span><span class=p>,</span><span class=w> </span><span class=n>game_id</span><span class=p>,</span><span class=w> </span><span class=n>chl_id</span><span class=p>),</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>(</span><span class=n>tj_date</span><span class=p>,</span><span class=w> </span><span class=n>game_id</span><span class=p>,</span><span class=w> </span><span class=n>chl_id</span><span class=p>,</span><span class=w> </span><span class=n>plat</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>)</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=更新><a href=#%e6%9b%b4%e6%96%b0 class=header-anchor></a>更新</h3><blockquote><p>插入性能从低到高依次为：</p><p>executemany &lt; execute_batch &lt; prepare+execute_batch &lt; execute_values</p><p>更新性能从低到高依次为：</p><p>executemany &lt; execute_values &lt; execute_batch &lt; prepare+execute_batch</p><p>删除性能从低到高依次为：</p><p>executemany &lt; execute_batch &lt; execute_values &lt; prepare+execute_batch</p><p>作者：xiangrumei <a class=link href=https://www.bilibili.com/read/cv26399649/ target=_blank rel=noopener>https://www.bilibili.com/read/cv26399649/</a> 出处：bilibili</p></blockquote><h4 id=批量更新><a href=#%e6%89%b9%e9%87%8f%e6%9b%b4%e6%96%b0 class=header-anchor></a>批量更新</h4><p>使用临时表的方式：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>UPDATE_POST_SCORE</span> <span class=o>=</span> <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    UPDATE post_community SET score = tmp.score
+</span></span></span><span class=line><span class=cl><span class=s2>    FROM (VALUES (</span><span class=si>%s</span><span class=s2>, </span><span class=si>%s</span><span class=s2>)) AS tmp(id, score)
+</span></span></span><span class=line><span class=cl><span class=s2>    WHERE post_community.post_id=tmp.id;
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>psycopg2.extras</span> <span class=kn>import</span> <span class=n>execute_batch</span>
+</span></span><span class=line><span class=cl><span class=n>execute_batch</span><span class=p>(</span><span class=n>cursor</span><span class=p>,</span> <span class=n>UPDATE_POST_SCORE</span><span class=p>,</span> <span class=n>result</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>如果数据量大，不能一次将数据全部加载进内存，使用 <code>itersize</code> 或 <code>fetchmany</code> 分批次读取，前提是使用命名游标 <a class=link href=https://www.psycopg.org/docs/usage.html#server-side-cursors target=_blank rel=noopener><code>named cursor</code></a>。</p><blockquote><p><a class=link href=https://stackoverflow.com/questions/63623336/how-does-psycopg2-server-side-cursor-operate-when-itersize-is-less-than-data-siz target=_blank rel=noopener>stackoverflow 命名游标的使用分析</a></p><p>注意：使用命名游标情况下，如果使用 fetchmany，即使设置了 itersize，itersize 也不会生效。</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>cursor</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>conn</span><span class=o>.</span><span class=n>connection</span><span class=o>.</span><span class=n>cursor</span><span class=p>(</span><span class=n>name</span><span class=o>=</span><span class=s2>&#34;named_cursor&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>cursor</span><span class=o>.</span><span class=n>itersize</span> <span class=o>=</span> <span class=mi>5000</span>
+</span></span><span class=line><span class=cl><span class=n>cursor</span><span class=o>.</span><span class=n>execute</span><span class=p>(</span><span class=n>SELECT_POST_COUNTS</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>data</span> <span class=o>=</span> <span class=n>cursor</span><span class=o>.</span><span class=n>fetchmany</span><span class=p>(</span><span class=mi>20000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>now</span> <span class=o>=</span> <span class=n>DT</span><span class=o>.</span><span class=n>now_time</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=k>while</span> <span class=n>data</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>result</span> <span class=o>=</span> <span class=nb>map</span><span class=p>(</span><span class=k>lambda</span> <span class=n>x</span><span class=p>:</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=n>x</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>        <span class=p>(</span><span class=n>x</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span> <span class=o>+</span> <span class=mi>2</span> <span class=o>*</span> <span class=n>x</span><span class=p>[</span><span class=mi>2</span><span class=p>]</span> <span class=o>+</span> <span class=mi>3</span> <span class=o>*</span> <span class=n>x</span><span class=p>[</span><span class=mi>3</span><span class=p>])</span> <span class=o>/</span> <span class=p>(</span><span class=mi>6</span> <span class=o>*</span> <span class=p>((</span><span class=nb>round</span><span class=p>((</span><span class=n>now</span> <span class=o>-</span> <span class=n>x</span><span class=p>[</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=n>tzinfo</span><span class=o>=</span><span class=n>now</span><span class=o>.</span><span class=n>tzinfo</span><span class=p>))</span><span class=o>.</span><span class=n>total_seconds</span><span class=p>()</span> <span class=o>/</span> <span class=mi>3600</span> <span class=o>+</span> <span class=mi>2</span><span class=p>))</span> <span class=o>**</span> <span class=mf>1.8</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=p>),</span> <span class=n>data</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>execute_batch</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>cursor</span><span class=p>,</span> <span class=n>UPDATE_POST_SCORE</span><span class=p>,</span> <span class=n>result</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>data</span> <span class=o>=</span> <span class=n>cursor</span><span class=o>.</span><span class=n>fetchmany</span><span class=p>(</span><span class=mi>20000</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=删除><a href=#%e5%88%a0%e9%99%a4 class=header-anchor></a>删除</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=o>-</span><span class=w> </span><span class=err>清空表数据并重置主键</span><span class=w> </span><span class=n>id</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>TRUNCATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=n>post_community</span><span class=w> </span><span class=k>RESTART</span><span class=w> </span><span class=k>IDENTITY</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=o>-</span><span class=w> </span><span class=err>删除列后重建表，把仍保留的列重新紧凑写入新文件，然后替换旧文件，清除物理数据</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>VACUUM</span><span class=w> </span><span class=k>FULL</span><span class=w> </span><span class=n>qbank_inline_label_repair_backups</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=分区><a href=#%e5%88%86%e5%8c%ba class=header-anchor></a>分区</h3><p>分区模式：</p><ul><li>range —— 基于连续范围分区</li><li>list —— 基于离散值分区</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=c1>-- 让 rtime 分区
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=k>IF</span><span class=w> </span><span class=k>NOT</span><span class=w> </span><span class=k>EXISTS</span><span class=w> </span><span class=s2>&#34;event_log&#34;</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=n>event</span><span class=w> </span><span class=nb>VARCHAR</span><span class=p>(</span><span class=mi>50</span><span class=p>),</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=n>rtime</span><span class=w> </span><span class=nb>INT</span><span class=w> </span><span class=k>NOT</span><span class=w> </span><span class=k>NULL</span><span class=w> </span><span class=k>DEFAULT</span><span class=w> </span><span class=k>EXTRACT</span><span class=p>(</span><span class=n>EPOCH</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=k>CURRENT_TIMESTAMP</span><span class=p>)::</span><span class=nb>INT</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=n>distinct_id</span><span class=w> </span><span class=nb>VARCHAR</span><span class=w> </span><span class=k>NOT</span><span class=w> </span><span class=k>NULL</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=n>user_id</span><span class=w> </span><span class=nb>INT</span><span class=w> </span><span class=k>DEFAULT</span><span class=w> </span><span class=o>-</span><span class=mi>1</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=n>args</span><span class=w> </span><span class=n>json</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>)</span><span class=w> </span><span class=n>PARTITION</span><span class=w> </span><span class=k>BY</span><span class=w> </span><span class=n>range</span><span class=w> </span><span class=p>(</span><span class=n>rtime</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>-- 不属于任何分区的数据将会插入到默认表中
+</span></span></span><span class=line><span class=cl><span class=k>CREATE</span><span class=w> </span><span class=k>TABLE</span><span class=w> </span><span class=n>event_log_default</span><span class=w> </span><span class=n>PARTITION</span><span class=w> </span><span class=k>OF</span><span class=w> </span><span class=n>event_log</span><span class=w> </span><span class=k>DEFAULT</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>创建分区表不建议使用触发器（会降低性能），因此使用脚本定时任务创建，比如当月 25 号创建下个月的分区表，具体创建逻辑据业务而定。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>dateutil.relativedelta</span> <span class=kn>import</span> <span class=n>relativedelta</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>part_table_by_month</span><span class=p>(</span><span class=n>sub_table</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;按月分区表&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>now</span> <span class=o>=</span> <span class=n>DT</span><span class=o>.</span><span class=n>cur_dt</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=nb>next</span> <span class=o>=</span> <span class=n>now</span> <span class=o>+</span> <span class=n>relativedelta</span><span class=p>(</span><span class=n>months</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>  <span class=c1># 下一个月</span>
+</span></span><span class=line><span class=cl>    <span class=n>next_next</span> <span class=o>=</span> <span class=nb>next</span> <span class=o>+</span> <span class=n>relativedelta</span><span class=p>(</span><span class=n>months</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>  <span class=c1># 下下个月</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>part_name</span> <span class=o>=</span> <span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>sub_table</span><span class=si>}</span><span class=s2>_</span><span class=si>{</span><span class=nb>next</span><span class=o>.</span><span class=n>year</span><span class=si>}{</span><span class=nb>next</span><span class=o>.</span><span class=n>month</span><span class=si>:</span><span class=s2>02d</span><span class=si>}</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>start</span> <span class=o>=</span> <span class=n>DT</span><span class=o>.</span><span class=n>str2ts</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=nb>next</span><span class=o>.</span><span class=n>year</span><span class=si>}</span><span class=s2>-</span><span class=si>{</span><span class=nb>next</span><span class=o>.</span><span class=n>month</span><span class=si>}</span><span class=s2>-01&#34;</span><span class=p>,</span> <span class=s2>&#34;%Y-%m-</span><span class=si>%d</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span> <span class=o>=</span> <span class=n>DT</span><span class=o>.</span><span class=n>str2ts</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>next_next</span><span class=o>.</span><span class=n>year</span><span class=si>}</span><span class=s2>-</span><span class=si>{</span><span class=n>next_next</span><span class=o>.</span><span class=n>month</span><span class=si>}</span><span class=s2>-01&#34;</span><span class=p>,</span> <span class=s2>&#34;%Y-%m-</span><span class=si>%d</span><span class=s2>&#34;</span><span class=p>)</span> <span class=o>-</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>part_ret</span> <span class=o>=</span> <span class=n>part_table</span><span class=p>(</span><span class=n>sub_table</span><span class=p>,</span> <span class=n>start</span><span class=p>,</span> <span class=n>end</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>logger</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;创建分区表成功: </span><span class=si>{</span><span class=n>part_ret</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>logger</span><span class=o>.</span><span class=n>critical</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;创建分区表失败: </span><span class=si>{</span><span class=n>part_name</span><span class=si>}</span><span class=s2>, 失败原因：</span><span class=si>{</span><span class=nb>str</span><span class=p>(</span><span class=n>e</span><span class=p>)</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>part_table</span><span class=p>(</span><span class=n>sub_table</span><span class=p>:</span> <span class=nb>str</span><span class=p>,</span> <span class=n>start</span><span class=p>,</span> <span class=n>end</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    按月创建分区表（当月触发，创建下个月的）
+</span></span></span><span class=line><span class=cl><span class=s2>    :param end: 分区结束范围
+</span></span></span><span class=line><span class=cl><span class=s2>    :param start: 分区起始范围
+</span></span></span><span class=line><span class=cl><span class=s2>    :param sub_table: 主表名
+</span></span></span><span class=line><span class=cl><span class=s2>    :return: 分区表名
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>sql_command</span> <span class=o>=</span> <span class=sa>f</span><span class=s2>&#34;&#34;&#34;CREATE TABLE IF NOT EXISTS </span><span class=si>{</span><span class=n>sub_table</span><span class=si>}</span><span class=s2> PARTITION OF </span><span class=si>{</span><span class=n>sub_table</span><span class=si>}</span><span class=s2> FOR VALUES FROM (:start) TO (:end);&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>db</span><span class=o>.</span><span class=n>session</span><span class=o>.</span><span class=n>execute</span><span class=p>(</span><span class=n>text</span><span class=p>(</span><span class=n>sql_command</span><span class=p>),</span> <span class=p>{</span><span class=s2>&#34;start&#34;</span><span class=p>:</span> <span class=n>start</span><span class=p>,</span> <span class=s2>&#34;end&#34;</span><span class=p>:</span> <span class=n>end</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>        <span class=n>db</span><span class=o>.</span><span class=n>session</span><span class=o>.</span><span class=n>commit</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>sub_table</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>db</span><span class=o>.</span><span class=n>session</span><span class=o>.</span><span class=n>rollback</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>raise</span> <span class=n>e</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=窗口函数><a href=#%e7%aa%97%e5%8f%a3%e5%87%bd%e6%95%b0 class=header-anchor></a>窗口函数</h3><div class=table-wrapper><table><thead><tr><th>函数</th><th>说明</th></tr></thead><tbody><tr><td><code>row_number()</code></td><td>依次编号</td></tr><tr><td><code>rank()</code></td><td>跳过并列编号：1 1 1 4</td></tr><tr><td><code>dense_rank()</code></td><td>不跳过并列行：1 1 1 2</td></tr></tbody></table></div><h3 id=统计表的大小><a href=#%e7%bb%9f%e8%ae%a1%e8%a1%a8%e7%9a%84%e5%a4%a7%e5%b0%8f class=header-anchor></a>统计表的大小</h3><p>PostgreSQL 提供了几个函数来查看表的大小，它们的区别在于统计的范围：</p><div class=table-wrapper><table><thead><tr><th style=text-align:left>函数</th><th style=text-align:left>统计范围</th><th style=text-align:left>说明</th></tr></thead><tbody><tr><td style=text-align:left><code>pg_relation_size('表名')</code></td><td style=text-align:left><strong>仅表的数据</strong></td><td style=text-align:left>不包括索引、TOAST 数据等。</td></tr><tr><td style=text-align:left><code>pg_table_size('表名')</code></td><td style=text-align:left><strong>表的数据 + TOAST</strong></td><td style=text-align:left>包括表数据、TOAST 数据、空闲空间映射和可见性映射，<strong>但不包括索引</strong>。</td></tr><tr><td style=text-align:left><code>pg_total_relation_size('表名')</code></td><td style=text-align:left><strong>表的数据 + 索引 + TOAST</strong></td><td style=text-align:left>这是最全面的统计，<strong>包含了表本身及其所有索引和 TOAST 数据的总大小</strong>。</td></tr><tr><td style=text-align:left><code>pg_indexes_size('表名')</code></td><td style=text-align:left><strong>仅索引</strong></td><td style=text-align:left>返回与表关联的所有索引的总大小。</td></tr></tbody></table></div><blockquote><p><strong>注意</strong>：上述函数中的 <code>'表名'</code> 参数格式为 <code>'模式名.表名'</code>，例如 <code>'public.users'</code>。为了便于阅读，这些函数常与 <code>pg_size_pretty()</code> 函数连用，将字节数转换为 <code>kB</code>、<code>MB</code>、<code>GB</code> 等人类易读的格式。</p></blockquote><p><strong>常用查询示例</strong></p><ol><li>查询特定<strong>表的总大小</strong>（包含数据和所有索引）</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>pg_size_pretty</span><span class=p>(</span><span class=n>pg_total_relation_size</span><span class=p>(</span><span class=s1>&#39;你的模式名.你的表名&#39;</span><span class=p>))</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=err>总大小</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ol start=2><li>查询特定表的<strong>数据大小</strong>（不包含索引）</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>pg_size_pretty</span><span class=p>(</span><span class=n>pg_relation_size</span><span class=p>(</span><span class=s1>&#39;你的模式名.你的表名&#39;</span><span class=p>))</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=err>数据大小</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ol start=3><li>查询数据库中<strong>所有表的大小</strong>，并按从大到小排序</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>SELECT</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>schemaname</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=err>模式</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>tablename</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=err>表名</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>pg_size_pretty</span><span class=p>(</span><span class=n>pg_total_relation_size</span><span class=p>(</span><span class=n>schemaname</span><span class=o>||</span><span class=s1>&#39;.&#39;</span><span class=o>||</span><span class=n>tablename</span><span class=p>))</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=err>总大小</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>pg_tables</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>WHERE</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>schemaname</span><span class=w> </span><span class=k>NOT</span><span class=w> </span><span class=k>IN</span><span class=w> </span><span class=p>(</span><span class=s1>&#39;information_schema&#39;</span><span class=p>,</span><span class=w> </span><span class=s1>&#39;pg_catalog&#39;</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>ORDER</span><span class=w> </span><span class=k>BY</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>pg_total_relation_size</span><span class=p>(</span><span class=n>schemaname</span><span class=o>||</span><span class=s1>&#39;.&#39;</span><span class=o>||</span><span class=n>tablename</span><span class=p>)</span><span class=w> </span><span class=k>DESC</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=统计数据库的大小><a href=#%e7%bb%9f%e8%ae%a1%e6%95%b0%e6%8d%ae%e5%ba%93%e7%9a%84%e5%a4%a7%e5%b0%8f class=header-anchor></a>统计数据库的大小</h3><p>统计数据库大小主要使用 <code>pg_database_size()</code> 函数。</p><div class=table-wrapper><table><thead><tr><th style=text-align:left>函数</th><th style=text-align:left>说明</th></tr></thead><tbody><tr><td style=text-align:left><code>pg_database_size('数据库名')</code></td><td style=text-align:left>返回指定数据库的总大小。</td></tr></tbody></table></div><p><strong>常用查询示例</strong></p><ol><li>查询特定<strong>数据库的大小</strong></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>pg_size_pretty</span><span class=p>(</span><span class=n>pg_database_size</span><span class=p>(</span><span class=s1>&#39;你的数据库名&#39;</span><span class=p>))</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=err>数据库大小</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ol start=2><li>查询 PostgreSQL 服务器上<strong>所有数据库的大小</strong>，并按从大到小排序</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>SELECT</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>datname</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=err>数据库名</span><span class=p>,</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>pg_size_pretty</span><span class=p>(</span><span class=n>pg_database_size</span><span class=p>(</span><span class=n>datname</span><span class=p>))</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=err>大小</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>pg_database</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>ORDER</span><span class=w> </span><span class=k>BY</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=n>pg_database_size</span><span class=p>(</span><span class=n>datname</span><span class=p>)</span><span class=w> </span><span class=k>DESC</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=补充使用-l-和-dt-命令><a href=#%e8%a1%a5%e5%85%85%e4%bd%bf%e7%94%a8-l-%e5%92%8c-dt-%e5%91%bd%e4%bb%a4 class=header-anchor></a>补充：使用 <code>\l+</code> 和 <code>\dt+</code> 命令</h3><p>如果你通过 <code>psql</code> 命令行工具连接数据库，也可以使用以下两个快捷命令：</p><ul><li><code>\l+</code>：列出所有数据库，并附带它们的<strong>大小</strong>、表空间和描述等信息。</li><li><code>\dt+ 表名</code>：显示指定表的详细信息，其中就包括<strong>大小</strong>。</li></ul><h2 id=数据库备份><a href=#%e6%95%b0%e6%8d%ae%e5%ba%93%e5%a4%87%e4%bb%bd class=header-anchor></a>数据库备份</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 备份数据库，排除`community_log`和 `users`表，仅导出数据不包括结构</span>
+</span></span><span class=line><span class=cl>pg_dump -h &lt;host&gt; -p &lt;port&gt; -U &lt;user&gt; -d &lt;database&gt; -F p --data-only -T community_log -T users &gt; /data/backup.sql
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 导出某张表</span>
+</span></span><span class=line><span class=cl>pg_dump -h host -p port -U username -s -t tablename dbname &gt; struct.sql
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 目标数据库上执行 sql 脚本</span>
+</span></span><span class=line><span class=cl>psql -h &lt;host&gt; -p &lt;port&gt; -U &lt;user&gt; -d &lt;database&gt; -W -f /data/backup.sql
+</span></span></code></pre></td></tr></table></div></div><h2 id=redis><a href=#redis class=header-anchor></a>Redis</h2><h3 id=配置><a href=#%e9%85%8d%e7%bd%ae class=header-anchor></a>配置</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 生成 10 位 base64 编码的密码并以标准字符集输出</span>
+</span></span><span class=line><span class=cl>openssl rand <span class=m>10</span> <span class=p>|</span> openssl base64 -A
+</span></span><span class=line><span class=cl>vim /etc/redis.conf, 取消 requirepass 行的注释，修改后面的值
+</span></span><span class=line><span class=cl>sudo systemctl restart redis
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 开启过期 key 事件监听（会有一定的额外消耗）</span>
+</span></span><span class=line><span class=cl>config <span class=nb>set</span> notify-keyspace-events Ex
+</span></span></code></pre></td></tr></table></div></div><h3 id=持久化策略><a href=#%e6%8c%81%e4%b9%85%e5%8c%96%e7%ad%96%e7%95%a5 class=header-anchor></a>持久化策略</h3><p>以下是 Redis 的两种持久化策略及其默认配置的对比表格：</p><div class=table-wrapper><table><thead><tr><th><strong>持久化策略</strong></th><th><strong>RDB (Redis Database)</strong></th><th><strong>AOF (Append Only File)</strong></th></tr></thead><tbody><tr><td><strong>原理</strong></td><td>定时生成内存快照（二进制文件）</td><td>记录所有写操作命令（文本追加日志）</td></tr><tr><td><strong>触发方式</strong></td><td>手动触发 / 按配置的时间间隔自动触发</td><td>实时记录（可配置同步频率：每秒/每次写入）</td></tr><tr><td><strong>文件格式</strong></td><td>紧凑的二进制文件（<code>.rdb</code>）</td><td>可读的文本文件（<code>.aof</code>）</td></tr><tr><td><strong>恢复速度</strong></td><td>快（直接加载快照）</td><td>慢（需重放所有命令）</td></tr><tr><td><strong>数据安全性</strong></td><td>可能丢失最后一次快照后的数据</td><td>更高（取决于同步频率，最多丢失 1 秒数据）</td></tr><tr><td><strong>文件体积</strong></td><td>小（仅最终数据状态）</td><td>大（持续增长，需定期重写优化）</td></tr><tr><td><strong>性能影响</strong></td><td>生成快照时可能阻塞主线程</td><td>写入日志对性能影响较小（但同步频繁时会降低吞吐量）</td></tr><tr><td><strong>默认启用</strong></td><td><strong>是</strong>（Redis 默认持久化方式）</td><td>否（需手动配置）</td></tr></tbody></table></div><h3 id=关键说明><a href=#%e5%85%b3%e9%94%ae%e8%af%b4%e6%98%8e class=header-anchor></a>关键说明</h3><ol><li><strong>默认策略</strong>：Redis 默认启用 <strong>RDB</strong> 持久化，会在以下条件满足时自动生成快照（可通过 <code>save</code> 配置修改）：</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=k>save</span> <span class=mi>900</span> <span class=mi>1</span>     <span class=c1># 900秒（15分钟）内至少1个key变化
+</span></span></span><span class=line><span class=cl><span class=s>save</span> <span class=mi>300</span> <span class=mi>10</span>    <span class=c1># 300秒（5分钟）内至少10个key变化
+</span></span></span><span class=line><span class=cl><span class=s>save</span> <span class=mi>60</span> <span class=mi>10000</span>  <span class=c1># 60秒内至少10000个key变化
+</span></span></span></code></pre></td></tr></table></div></div><ol start=2><li><p><strong>混合持久化（Redis 4.0+）</strong>：可同时启用 RDB 和 AOF（<code>aof-use-rdb-preamble yes</code>），结合两者优势：</p><ul><li>AOF 文件前半部分是 RDB 格式的快照，后半部分是增量命令。</li></ul></li><li><p><strong>如何选择</strong>：</p><ul><li><strong>RDB</strong> 适合备份、灾难恢复（快速加载）。</li><li><strong>AOF</strong> 适合需要高数据安全性的场景（如金融交易）。</li></ul></li></ol><h3 id=配置示例><a href=#%e9%85%8d%e7%bd%ae%e7%a4%ba%e4%be%8b class=header-anchor></a>配置示例</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=c1># 启用 RDB（默认已启用）
+</span></span></span><span class=line><span class=cl><span class=k>save</span> <span class=mi>900</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 启用 AOF
+</span></span></span><span class=line><span class=cl><span class=s>appendonly</span> <span class=s>yes</span>
+</span></span><span class=line><span class=cl><span class=s>appendfsync</span> <span class=s>everysec</span>  <span class=c1># 每秒同步一次（平衡性能与安全）
+</span></span></span></code></pre></td></tr></table></div></div><p>通过 <code>INFO PERSISTENCE</code> 命令可查看当前持久化状态。</p><h3 id=如何保证数据一致性><a href=#%e5%a6%82%e4%bd%95%e4%bf%9d%e8%af%81%e6%95%b0%e6%8d%ae%e4%b8%80%e8%87%b4%e6%80%a7 class=header-anchor></a>如何保证数据一致性？</h3><p><strong>非强一致性场景</strong>：先更新数据库，再删除缓存（加分布式锁保证线程安全）</p><p><strong>强一致性场景</strong>：延迟双删</p><ol><li>先删缓存，然后更新数据库，延迟删除缓存</li><li>先更新数据库，删缓存，延迟删缓存</li></ol><p>第 2 种更安全。</p><p>休眠时间 = 读业务逻辑数据的耗时 + 几百毫秒</p><p><strong>异步缓存写入</strong>：先更新缓存，再异步更新数据库（适用于动态数据且一致性要求不高的场景，如点赞、浏览等）</p><h3 id=redis-分布式锁><a href=#redis-%e5%88%86%e5%b8%83%e5%bc%8f%e9%94%81 class=header-anchor></a>Redis 分布式锁</h3><p><strong>redlock 算法</strong></p><p><a class=link href=https://redis.io/docs/manual/patterns/distributed-locks/#the-redlock-algorithm target=_blank rel=noopener>https://redis.io/docs/manual/patterns/distributed-locks/#the-redlock-algorithm</a></p><blockquote><ol><li>以毫秒为单位获取当前时间 T1。</li><li>尝试在所有 N 个实例中依次获取锁，在所有实例中使用相同的键名和随机值，并且会设置一个比锁的有效时间小的超时时间。例如，如果自动释放时间为 10 秒，那么超时时间可以在 5-50 毫秒之间。这样可以防止客户端在尝试与宕机的 Redis 节点通信时长时间处于阻塞状态：如果某个实例不可用，我们应尽快尝试与下一个实例通信。</li><li>客户端获取当前时间戳 T2。如果客户端能在大多数实例（至少 3 个）中获取锁，且 T2 - T1 &lt; 锁的有效时间时，才认为获取了锁。</li><li>如果锁已被获取，则其有效时间被认为是初始有效时间减去步骤 3 计算出的已用时间。</li><li>如果客户机因某种原因未能获取锁（要么无法锁定 N/2+1 个实例，要么有效时间为负），它将尝试解锁所有实例（甚至是它认为无法锁定的实例）。</li></ol></blockquote><p><strong>如何续期？</strong></p><p>额外启动一个守护线程定时去轮巡当前锁是否已释放。</p><h3 id=缓存击穿--缓存血崩><a href=#%e7%bc%93%e5%ad%98%e5%87%bb%e7%a9%bf--%e7%bc%93%e5%ad%98%e8%a1%80%e5%b4%a9 class=header-anchor></a>缓存击穿 & 缓存血崩</h3><blockquote><p>缓存击穿：单个热点 key 失效 + 并发访问，导致这些请求全部涌入数据库中</p><p>缓存穿透：缓存和 db 都没有数据 + 并发访问</p><p>缓存雪崩：批量 key 失效 + 并发访问，导致大量请求涌入数据库</p></blockquote><p><strong>解决缓存击穿</strong></p><ul><li>热点数据设置热度时间窗口，时间窗口内，延长缓存时间</li><li>多级缓存</li><li>设置较长的过期时间</li></ul><p><strong>解决缓存穿透</strong></p><ul><li>使用布隆过滤器判断元素是否存在，不存在则直接返回</li><li>空对象缓存：不存在的数据存储为空对象缓存</li><li>延迟双判：查询请求穿透到 db 时，先在 db 查询，db 也没有，则将空结果缓存，设置一个较短的过期时间</li><li>缓存预热</li><li>限流</li></ul><p><strong>解决缓存雪崩</strong></p><ul><li>多级缓存</li><li>缓存预热</li><li>key 设置随机过期时间</li></ul><h3 id=应用><a href=#%e5%ba%94%e7%94%a8 class=header-anchor></a>应用</h3><h4 id=hyperloglog-统计-uv><a href=#hyperloglog-%e7%bb%9f%e8%ae%a1-uv class=header-anchor></a>HyperLogLog 统计 UV</h4><blockquote><p>HyperLogLog (HLL) 是一种基数估计算法，用于统计一个集合中不重复元素的个数。</p><p>我们先来看一个简单的例子：假设有一个篮子，里面装满了彩色的球，每个球上都有一个不同的数字。现在我们想知道篮子里有多少种不同的数字，但是我们不希望一个个球拿出来去重，因为球可能有很多甚至无限个。</p><p><strong>具体原理如下</strong>：</p><ol><li>创建一个定长的位数组，里面的每个位都初始化为 0。</li><li>对于集合中的每个元素，通过哈希函数将其映射为一个二进制字符串，并取这个字符串中特定的一段作为索引。</li><li>在位数组对应的索引位置上，记录该位置出现的最大前导零的长度。</li><li>根据位数组中最大前导零的长度，估算出集合中不重复元素的个数。</li></ol><p>HyperLogLog 的核心思想是利用哈希函数的随机性和最大前导零的长度分布来估计不重复元素的个数。当位数组中的某个位置记录的最大前导零长度比较大时，说明这个位置对应的哈希值较小的元素较多，因此可以推测集合中不重复元素的个数也相对较多。</p><p>由于使用了哈希函数和概率统计，HyperLogLog 的估计结果可能会有一定的误差，但在实际应用中，这个误差通常是可接受的。</p><p><strong>HyperLogLog 是一种通过概率统计估计集合中不重复元素个数的算法，它以极小的内存开销来实现高效的基数估计。</strong></p><p><strong>模拟</strong>：<a class=link href=http://content.research.neustar.biz/blog/hll.html target=_blank rel=noopener>http://content.research.neustar.biz/blog/hll.html</a></p></blockquote><p><strong>命令</strong></p><ul><li>PFADD <code>PFADD key [element [element ...]]</code></li><li>PFCOUNT <code>PFCOUNT key [element [element ...]]</code></li><li>PFMERGE <code>PFMERGE key [element [element ...]]</code></li></ul><h4 id=incr-文章浏览量计数><a href=#incr-%e6%96%87%e7%ab%a0%e6%b5%8f%e8%a7%88%e9%87%8f%e8%ae%a1%e6%95%b0 class=header-anchor></a>incr 文章浏览量计数</h4><p>hincrby、incrby</p><h4 id=bitmap-位图><a href=#bitmap-%e4%bd%8d%e5%9b%be class=header-anchor></a>bitmap 位图</h4><blockquote><p>setbit key offset value</p><p>最大支持 512mb = 2^32 位</p></blockquote><ul><li><strong>账号封禁</strong></li></ul><p>一个封禁能力对应一个 bitmap，比如 <code>banned:login</code>，用户 id 作为偏移量。</p><p>封禁登录：<code>setbit banned:login 1000018 1</code></p><p>解禁登录：<code>setbit banned:login 1000018 0</code></p><p>判断是否被封禁：<code>getbit banned:login 1000018</code></p><p>如果用户 id 较大，可对 uid 哈希计算，或按一定规则处理，比如数据库中 uid 从 1000000 自增，那么偏移量可设为 <code>uid - 1000000</code>，其中偏移量是从 0 开始的。</p><h4 id=scan-扫描匹配的所有键><a href=#scan-%e6%89%ab%e6%8f%8f%e5%8c%b9%e9%85%8d%e7%9a%84%e6%89%80%e6%9c%89%e9%94%ae class=header-anchor></a>scan 扫描匹配的所有键</h4><p>相比较于 keys 命令阻塞式命令，大 key 会存在问题；scan 命令是一个基于游标的迭代器，每次迭代 count 返回一个游标继续下一次迭代，不过会存在重复值，需要去重。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>scan_uk</span><span class=p>(</span><span class=n>pattern</span><span class=p>,</span> <span class=n>count</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;使用 scan command 匹配 keys 并去重&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>uq_keys</span> <span class=o>=</span> <span class=nb>set</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>key</span> <span class=ow>in</span> <span class=n>client</span><span class=o>.</span><span class=n>scan_iter</span><span class=p>(</span><span class=k>match</span><span class=o>=</span><span class=n>pattern</span><span class=p>,</span> <span class=n>count</span><span class=o>=</span><span class=n>count</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>key</span> <span class=ow>not</span> <span class=ow>in</span> <span class=n>uq_keys</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>uq_keys</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>key</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>yield</span> <span class=n>key</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=其他><a href=#%e5%85%b6%e4%bb%96 class=header-anchor></a>其他</h2><h3 id=实现数据表格拖拽排序><a href=#%e5%ae%9e%e7%8e%b0%e6%95%b0%e6%8d%ae%e8%a1%a8%e6%a0%bc%e6%8b%96%e6%8b%bd%e6%8e%92%e5%ba%8f class=header-anchor></a>实现数据表格拖拽排序</h3><p><strong>1. 全量更新</strong> —— 添加一个 <code>sort</code> 字段，表示序号</p><ul><li>拖拽节点：最简单的方式是直接更新全部节点新的 sort 值（一般前端框架可以获取到更新后的序号），也可以只传这两个节点 id，服务端去计算 sort，更新这两个节点之间的记录的 sort。如果是前往后拖，则 <code>sort = sort - 1</code>，否则 <code>sort = sort + 1</code></li><li>删除节点：其后的节点全部前移一位</li><li>新增节点：新节点的 <code>parent_id = max(sort) + 1</code></li><li>适用场景：数据量小，拖拽操作不频繁</li></ul><p><strong>2. 单链表（邻接表）</strong> —— 添加一个 <code>parent_id</code> 字段，指向其前驱节点</p><ul><li>拖拽节点：需要交换这两个节点对应的 <code>parent_id</code> 值以及其前驱和后继节点的 <code>parent_id</code> 值</li><li>删除节点：更新其直接后继节点的 <code>parent_id</code> 值</li><li>新增节点：如果是尾插法，<code>parent_id = 链表最后一条记录的 id</code>；如果是头插法 <code>parent_id = null</code></li><li>适用场景：数据量中等，频繁拖拽，不适用于分页场景（因为获取父子节点关系必须按序遍历全部数据）</li></ul><p><strong>3. 双链表</strong> —— 添加 <code>pre</code> 和 <code>next</code> 字段</p><p><strong>交换两个节点：考虑以下几种情况</strong></p><p><strong>情况一：cur 在前，dest 在后</strong></p><ul><li><p><strong>节点相邻</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 更新当前对象的前驱节点的后继</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>pre</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>dest</span>
+</span></span><span class=line><span class=cl><span class=c1># 更新目标对象的后继节点的前驱</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>next</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>cur</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 更新目标对象前驱及后继</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>cur</span><span class=o>.</span><span class=n>pre</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>cur</span>
+</span></span><span class=line><span class=cl><span class=c1># 更新当前对象前驱及后继</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>dest</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>dest</span><span class=o>.</span><span class=n>next</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p><strong>节点不相邻</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 更新当前对象的前驱节点的后继</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>pre</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>dest</span>
+</span></span><span class=line><span class=cl><span class=c1># 更新目标对象的后继节点的前驱</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>next</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>cur</span>
+</span></span><span class=line><span class=cl><span class=c1># 更新当前对象的后继节点的前驱</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>next</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>dest</span>
+</span></span><span class=line><span class=cl><span class=c1># 更新目标对象的前驱节点的后继</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>pre</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>cur</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 更新目标对象前驱及后继</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>cur</span><span class=o>.</span><span class=n>pre</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>cur</span><span class=o>.</span><span class=n>next</span>
+</span></span><span class=line><span class=cl><span class=c1># 更新当前对象前驱及后继</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>dest</span><span class=o>.</span><span class=n>pre</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>dest</span><span class=o>.</span><span class=n>next</span>
+</span></span></code></pre></td></tr></table></div></div></li></ul><p><strong>情况二：cur 在后，dest 在前</strong></p><ul><li><p><strong>节点相邻</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>next</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>dest</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>pre</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>cur</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>cur</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>cur</span><span class=o>.</span><span class=n>next</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>dest</span><span class=o>.</span><span class=n>pre</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>dest</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p><strong>节点不相邻</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>next</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>dest</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>pre</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>cur</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>pre</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>dest</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>next</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>cur</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>cur</span><span class=o>.</span><span class=n>pre</span>
+</span></span><span class=line><span class=cl><span class=n>dest</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>cur</span><span class=o>.</span><span class=n>next</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>pre</span> <span class=o>=</span> <span class=n>dest</span>
+</span></span><span class=line><span class=cl><span class=n>cur</span><span class=o>.</span><span class=n>next</span> <span class=o>=</span> <span class=n>dest</span><span class=o>.</span><span class=n>next</span>
+</span></span></code></pre></td></tr></table></div></div></li></ul><p><strong>如何判断双链表中任意两个节点的先后关系？</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>find_order</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>n1</span><span class=p>:</span> <span class=n>QueryT</span><span class=p>,</span> <span class=n>n2</span><span class=p>:</span> <span class=n>QueryT</span><span class=p>,</span> <span class=n>filters</span><span class=p>:</span> <span class=nb>list</span> <span class=o>=</span> <span class=kc>None</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    比较两个节点的顺序
+</span></span></span><span class=line><span class=cl><span class=s2>    :param n1:
+</span></span></span><span class=line><span class=cl><span class=s2>    :param n2:
+</span></span></span><span class=line><span class=cl><span class=s2>    :param filters:
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>        1 n1在前
+</span></span></span><span class=line><span class=cl><span class=s2>        -1 n1在后
+</span></span></span><span class=line><span class=cl><span class=s2>        None 节点不满足链表关系
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>filters</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>filters</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>data</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>model</span><span class=o>.</span><span class=n>query</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=o>*</span><span class=n>filters</span><span class=p>)</span><span class=o>.</span><span class=n>all</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>nodes</span> <span class=o>=</span> <span class=p>{</span><span class=bp>self</span><span class=o>.</span><span class=n>get_cur</span><span class=p>(</span><span class=n>item</span><span class=p>):</span> <span class=n>item</span> <span class=k>for</span> <span class=n>item</span> <span class=ow>in</span> <span class=n>data</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>cur</span> <span class=o>=</span> <span class=n>n1</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>cur</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>get_cur</span><span class=p>(</span><span class=n>cur</span><span class=p>)</span> <span class=o>==</span> <span class=bp>self</span><span class=o>.</span><span class=n>get_cur</span><span class=p>(</span><span class=n>n2</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=n>cur</span> <span class=o>=</span> <span class=n>nodes</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>get_next</span><span class=p>(</span><span class=n>cur</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>cur</span> <span class=o>=</span> <span class=n>n2</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>cur</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>get_cur</span><span class=p>(</span><span class=n>cur</span><span class=p>)</span> <span class=o>==</span> <span class=bp>self</span><span class=o>.</span><span class=n>get_cur</span><span class=p>(</span><span class=n>n1</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=n>cur</span> <span class=o>=</span> <span class=n>nodes</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>get_next</span><span class=p>(</span><span class=n>cur</span><span class=p>))</span>
+</span></span></code></pre></td></tr></table></div></div><p>使用 pgsql 递归查询：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=k>WITH</span><span class=w> </span><span class=k>RECURSIVE</span><span class=w> </span><span class=n>cte</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=p>(</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>SELECT</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>avatar_management</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>WHERE</span><span class=w> </span><span class=n>pre_id</span><span class=w> </span><span class=k>IS</span><span class=w> </span><span class=k>NULL</span><span class=w> </span><span class=k>and</span><span class=w> </span><span class=n>community_id</span><span class=o>=</span><span class=mi>8</span><span class=w>  </span><span class=c1>-- 找到链表的起始节点，即 pre_id 为空的节点
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>UNION</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=k>SELECT</span><span class=w> </span><span class=n>am</span><span class=p>.</span><span class=o>*</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=k>FROM</span><span class=w> </span><span class=n>avatar_management</span><span class=w> </span><span class=n>am</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=k>JOIN</span><span class=w> </span><span class=n>cte</span><span class=w> </span><span class=k>ON</span><span class=w> </span><span class=n>am</span><span class=p>.</span><span class=n>pre_id</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>cte</span><span class=p>.</span><span class=n>id</span><span class=w>  </span><span class=c1>-- 通过递归连接找到下一个节点
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=k>where</span><span class=w> </span><span class=n>am</span><span class=p>.</span><span class=n>community_id</span><span class=o>=</span><span class=mi>8</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>cte</span><span class=p>;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p><strong>4. 闭包表</strong> —— 需要建立额外一张表 <code>TreePath</code>，使用空间换时间策略</p><p>包含 3 个字段，（ancestor，descendant）设为联合主键，其中每一个字段都是指向 <code>target_id</code> 的外键，level 用来表示层级深度：</p><ul><li>ancestor</li><li>descendant</li><li>level（可选）</li></ul><h3 id=分页查询><a href=#%e5%88%86%e9%a1%b5%e6%9f%a5%e8%af%a2 class=header-anchor></a>分页查询</h3><h4 id=redis-zset-分页><a href=#redis-zset-%e5%88%86%e9%a1%b5 class=header-anchor></a>Redis zset 分页</h4><p><strong>场景举例</strong>：评论分页（按热度排序）</p><blockquote><p>由于热度值是动态变化的，且不能暴露给客户端，传统分页必然不行，zset 可以很好解决这个问题。<code>stamp</code> 是数据快照标识（比如当前时间戳），可保证在分页过程中的数据完整性和一致性，每次发布新评论或删除评论都是操作的最新数据快照缓存，有效期设为 6h 或 8h。</p></blockquote><p>查询参数：</p><ul><li><code>last</code> —— 前一次查询返回的游标，即下次查询的起始索引</li><li><code>limit</code> —— 分页大小</li><li><code>stamp</code> —— 数据快照标识（比如当前时间戳）</li></ul><p>缓存 key 设计：<code>comment:${资源类型}_${资源id}_${排序方式}_${数据版本标识}</code></p><p>key 存在才可操作，并且需要设置一个合适的 ttl，集合元素个数最好不要超过 5000。</p><p><strong>相关命令</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>ZREVRANGE 按分数值递减返回指定区间内的成员，相同 score 的 member 按字典序的逆序排列
+</span></span><span class=line><span class=cl>&gt;&gt; ZREVRANGE key start stop [WITHSCORES]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>向集合中插入元素，评论 id 作为 member，热度值作为 score
+</span></span><span class=line><span class=cl>&gt;&gt; ZADD key score1 member1 score2 member2 ...
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>删除元素
+</span></span><span class=line><span class=cl>&gt;&gt; ZREM key member
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>查询
+</span></span><span class=line><span class=cl>&gt;&gt; zrevrange key last last + limit - 1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>获取总数
+</span></span><span class=line><span class=cl>&gt;&gt; zcard key
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 获取最新 key</span>
+</span></span><span class=line><span class=cl><span class=nb>max</span><span class=p>(</span><span class=n>keys</span><span class=p>,</span> <span class=n>key</span><span class=o>=</span><span class=k>lambda</span> <span class=n>x</span><span class=p>:</span> <span class=nb>int</span><span class=p>(</span><span class=n>x</span><span class=o>.</span><span class=n>split</span><span class=p>(</span><span class=s2>&#34;_&#34;</span><span class=p>)[</span><span class=o>-</span><span class=mi>1</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>last</span> <span class=o>=</span> <span class=n>last</span> <span class=o>+</span> <span class=n>limit</span> <span class=k>if</span> <span class=n>last</span> <span class=o>+</span> <span class=n>limit</span> <span class=o>&lt;</span> <span class=n>total</span> <span class=k>else</span> <span class=kc>None</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>注意：缓存只保存评论 id，且只有当缓存 key 存在才插入</strong></p><h3 id=游客模式><a href=#%e6%b8%b8%e5%ae%a2%e6%a8%a1%e5%bc%8f class=header-anchor></a>游客模式</h3><p>首次使用 app 时服务端分配一个 uid，status 设为 -1 表示游客。</p><ul><li>使用未占用的手机号或三方账号登录时，uid 不变，修改状态为 1，数据不合并</li><li>使用已占用的手机号或三方账户登录时，uid 更换为新登录账号的 uid（相当于切换账号），数据不合并</li></ul></section><footer class="article-meta article-footer"><section class=article-tags><a href=/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/>数据库</a>
+<a href=/tags/mysql/>MySQL</a>
+<a href=/tags/redis/>Redis</a></section></footer><nav class=article-prevnext aria-label=相邻文章><a class="article-prevnext__item article-prevnext__item--older" href=/p/git-notes/ rel=prev><span class=article-prevnext__label><svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+<span>上一篇</span>
+</span><span class=article-prevnext__title>Git Notes</span>
+<span class=article-prevnext__date>2023.04.12</span>
+</a><a class="article-prevnext__item article-prevnext__item--newer" href=/p/celery/ rel=next><span class=article-prevnext__label><span>下一篇</span>
+<svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+</span><span class=article-prevnext__title>Celery</span>
+<span class=article-prevnext__date>2024.02.01</span></a></nav></article><script type=module>
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main><footer class=site-footer><div class=site-footer__inner><div class=site-footer__cta><h2>有想法？<br><span>我们聊聊。</span></h2><a class=site-footer__email href=mailto:yuqiuwen2020@gmail.com>yuqiuwen2020@gmail.com ↗</a></div><div class=site-footer__bottom><span>© 2026 Yu Qiuwen</span><div class=site-footer__social><a href=mailto:yuqiuwen2020@gmail.com><svg class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg>
+<span>Email</span>
+</a><a href=https://github.com/yuqiuwen target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+<span>GitHub</span>
+</a><a href=/index.xml target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="5" cy="19" r="1"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg>
+<span>RSS</span></a></div></div></div></footer><script src=/js/gate.min.2d3ffea2c40fd0275c673de6c9daa61d0491889ed40ec7f56751951b9d0022f0.js integrity="sha256-LT/+osQP0CdcZz3mydqmHQSRiJ7UDsf1Z1GVG50AIvA=" defer></script><script type=text/javascript src=/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js defer></script></body></html>
