@@ -1,0 +1,195 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="一、总览 mindmap root((Agent架构模式)) 推理与行动 ReAct Plan-and-Execute ReWOO CodeAct ToT / LATS 自我改进 Reflection / Reflexion Self-Refine 工作流编排 Prompt Chaining Routing Parallelization Orchestrator-Workers Evaluator-Optimizer 多Agent协作 Supervisor Hierarchical Swarm / Handoff Debate Blackboard 能力增强 Tool Use RAG / Agentic RAG Memory Human-in-the-Loop State Machine / Graph核心分界线：\n"><title>Agent常用架构设计模式</title><link rel=canonical href=https://yuqiuwen.github.io/p/agent%E5%B8%B8%E7%94%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/><link rel=stylesheet href=/scss/style.min.022d5e97640812f1fd48cc3fd1b4b10c8ecb705cf4a58eaf1d3b8d0ce81713a4.css><meta property='og:title' content="Agent常用架构设计模式"><meta property='og:description' content="一、总览 mindmap root((Agent架构模式)) 推理与行动 ReAct Plan-and-Execute ReWOO CodeAct ToT / LATS 自我改进 Reflection / Reflexion Self-Refine 工作流编排 Prompt Chaining Routing Parallelization Orchestrator-Workers Evaluator-Optimizer 多Agent协作 Supervisor Hierarchical Swarm / Handoff Debate Blackboard 能力增强 Tool Use RAG / Agentic RAG Memory Human-in-the-Loop State Machine / Graph核心分界线：\n"><meta property='og:url' content='https://yuqiuwen.github.io/p/agent%E5%B8%B8%E7%94%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/'><meta property='og:site_name' content='yuqiuwen'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Agent'><meta property='article:published_time' content='2026-11-27T16:01:41+08:00'><meta property='article:modified_time' content='2026-11-27T16:01:41+08:00'><meta name=twitter:title content="Agent常用架构设计模式"><meta name=twitter:description content="一、总览 mindmap root((Agent架构模式)) 推理与行动 ReAct Plan-and-Execute ReWOO CodeAct ToT / LATS 自我改进 Reflection / Reflexion Self-Refine 工作流编排 Prompt Chaining Routing Parallelization Orchestrator-Workers Evaluator-Optimizer 多Agent协作 Supervisor Hierarchical Swarm / Handoff Debate Blackboard 能力增强 Tool Use RAG / Agentic RAG Memory Human-in-the-Loop State Machine / Graph核心分界线：\n"><link rel="shortcut icon" href=/img/favicon_hu_c4c613dd8e36f1ca.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"dark")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-nav><div class=site-nav__inner><a class=site-logo href=/>Yu.<span>QW</span></a><nav class=site-nav__links aria-label=主导航><a href=/>首页</a><a href=/projects/>作品集</a><a href=/post/ class=is-active aria-current=page>博客</a><a href=/food/>美食</a><a href=/about/>关于我</a><a href=/archives/>归档</a><a href=/search/>搜索</a></nav><button class=scheme-toggle id=dark-mode-toggle type=button aria-label="切换深色 / 浅色">
+<svg class="scheme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2m0 14.8v2.2M4.2 12H2m20 0h-2.2M6.2 6.2 4.7 4.7M19.3 19.3l-1.5-1.5m0-11.6 1.5-1.5M4.7 19.3l1.5-1.5"/></svg>
+<svg class="scheme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6.0 019.4 3.5a8.6 8.6.0 1011.1 11.1z"/></svg></button></div></header><main class=site-main><article class=main-article><header class=article-header><div class=article-details><div class=article-title-wrapper><h2 class=article-title><a href=/p/agent%E5%B8%B8%E7%94%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/>Agent常用架构设计模式</a></h2></div><footer class=article-meta><div class=inline-meta><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2026-11-27T16:01:41+08:00>2026 年 11 月 27 日</time>
+<svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 8 分钟</time></div></footer></div></header><aside class=article-toc><details><summary><div class=article-toc-title><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目录</span></div></summary><nav class=toc-nav id=TableOfContents><ol><li><a href=#一总览>一、总览</a></li><li><a href=#二单-agent推理与行动模式>二、单 Agent：推理与行动模式</a><ol><li><a href=#1-reactreasoning--acting>1. ReAct（Reasoning + Acting）</a></li><li><a href=#2-plan-and-execute先规划后执行>2. Plan-and-Execute（先规划后执行）</a></li><li><a href=#3-rewooreasoning-without-observation>3. ReWOO（Reasoning WithOut Observation）</a></li><li><a href=#4-codeact以代码为行动>4. CodeAct（以代码为行动）</a></li><li><a href=#5-tot--got--lats树图搜索式推理>5. ToT / GoT / LATS（树/图搜索式推理）</a></li></ol></li><li><a href=#三自我改进模式>三、自我改进模式</a><ol><li><a href=#6-reflection--reflexion--self-refine>6. Reflection / Reflexion / Self-Refine</a></li></ol></li><li><a href=#四工作流编排模式anthropic-总结的五种>四、工作流编排模式（Anthropic 总结的五种）</a><ol><li><a href=#7-prompt-chaining提示链>7. Prompt Chaining（提示链）</a></li><li><a href=#8-routing路由>8. Routing（路由）</a></li><li><a href=#9-parallelization并行化>9. Parallelization（并行化）</a></li><li><a href=#10-orchestrator-workers编排者-工作者>10. Orchestrator-Workers（编排者-工作者）</a></li><li><a href=#11-evaluator-optimizer评估者-优化者>11. Evaluator-Optimizer（评估者-优化者）</a></li></ol></li><li><a href=#五多-agent-协作模式>五、多 Agent 协作模式</a><ol><li><a href=#12-supervisor监督者中心调度>12. Supervisor（监督者/中心调度）</a></li><li><a href=#13-hierarchical层级式>13. Hierarchical（层级式）</a></li><li><a href=#14-swarm--handoff群体交接>14. Swarm / Handoff（群体/交接）</a></li><li><a href=#15-debate--critic辩论评审>15. Debate / Critic（辩论/评审）</a></li><li><a href=#16-blackboard黑板模式>16. Blackboard（黑板模式）</a></li></ol></li><li><a href=#六能力增强类模式可与上述叠加>六、能力增强类模式（可与上述叠加）</a></li><li><a href=#七核心对比表>七、核心对比表</a><ol><li><a href=#1-单-agent-推理模式对比>1. 单 Agent 推理模式对比</a></li><li><a href=#2-工作流模式对比>2. 工作流模式对比</a></li><li><a href=#3-多-agent-模式对比>3. 多 Agent 模式对比</a></li></ol></li><li><a href=#八易混淆概念辨析>八、易混淆概念辨析</a></li><li><a href=#九选型决策流程>九、选型决策流程</a></li></ol></nav></details></aside><section class=article-content><h2 id=一总览><a href=#%e4%b8%80%e6%80%bb%e8%a7%88 class=header-anchor></a>一、总览</h2><pre class=mermaid style=visibility:hidden>mindmap
+  root((Agent架构模式))
+    推理与行动
+      ReAct
+      Plan-and-Execute
+      ReWOO
+      CodeAct
+      ToT / LATS
+    自我改进
+      Reflection / Reflexion
+      Self-Refine
+    工作流编排
+      Prompt Chaining
+      Routing
+      Parallelization
+      Orchestrator-Workers
+      Evaluator-Optimizer
+    多Agent协作
+      Supervisor
+      Hierarchical
+      Swarm / Handoff
+      Debate
+      Blackboard
+    能力增强
+      Tool Use
+      RAG / Agentic RAG
+      Memory
+      Human-in-the-Loop
+      State Machine / Graph</pre><p><strong>核心分界线：</strong></p><ul><li><strong>Workflow（工作流）</strong>：流程由代码预先定义，LLM 只负责节点内的任务，可控、稳定、成本低。</li><li><strong>Agent（智能体）</strong>：LLM 动态决定下一步做什么、用什么工具，灵活但不可预测、成本高。</li></ul><hr><h2 id=二单-agent推理与行动模式><a href=#%e4%ba%8c%e5%8d%95-agent%e6%8e%a8%e7%90%86%e4%b8%8e%e8%a1%8c%e5%8a%a8%e6%a8%a1%e5%bc%8f class=header-anchor></a>二、单 Agent：推理与行动模式</h2><h3 id=1-reactreasoning--acting><a href=#1-reactreasoning--acting class=header-anchor></a>1. ReAct（Reasoning + Acting）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    Q[用户问题] --> T[Thought 思考]
+    T --> A[Action 调用工具]
+    A --> O[Observation 观察结果]
+    O --> T
+    T --> F[Final Answer]</pre><ul><li><strong>思想</strong>：边想边做，每一步根据上一步的观察结果决定下一步。</li><li><strong>场景</strong>：问答、搜索、简单工具调用、客服。</li><li><strong>优点</strong>：简单通用，适应性强，可解释。</li><li><strong>缺点</strong>：步步调用 LLM，成本高；容易陷入循环或短视。</li></ul><h3 id=2-plan-and-execute先规划后执行><a href=#2-plan-and-execute%e5%85%88%e8%a7%84%e5%88%92%e5%90%8e%e6%89%a7%e8%a1%8c class=header-anchor></a>2. Plan-and-Execute（先规划后执行）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    Q[任务] --> P[Planner 制定计划]
+    P --> E[Executor 逐步执行]
+    E --> R{需要重新规划?}
+    R -- 是 --> P
+    R -- 否 --> F[输出结果]</pre><ul><li><strong>思想</strong>：规划与执行分离，可用大模型规划、小模型执行。</li><li><strong>场景</strong>：长链路任务，如研究报告、数据分析、自动化运维。</li><li><strong>优点</strong>：全局视角强，执行阶段可用小模型降本。</li><li><strong>缺点</strong>：计划可能不合理，需要 replan 机制。</li></ul><h3 id=3-rewooreasoning-without-observation><a href=#3-rewooreasoning-without-observation class=header-anchor></a>3. ReWOO（Reasoning WithOut Observation）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    Q[任务] --> P["Planner 一次性生成计划，含变量占位 #E1 #E2"]
+    P --> W[Worker 批量执行工具]
+    W --> S[Solver 汇总证据生成答案]</pre><ul><li><strong>思想</strong>：规划时不等待工具结果，用变量占位，最后统一汇总。</li><li><strong>场景</strong>：步骤相对确定、对 token 成本敏感的任务。</li><li><strong>优点</strong>：LLM 调用次数少，省 token，可并行。</li><li><strong>缺点</strong>：无法根据中间结果动态调整。</li></ul><h3 id=4-codeact以代码为行动><a href=#4-codeact%e4%bb%a5%e4%bb%a3%e7%a0%81%e4%b8%ba%e8%a1%8c%e5%8a%a8 class=header-anchor></a>4. CodeAct（以代码为行动）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    T[LLM 生成代码] --> S[沙箱执行]
+    S --> R[执行结果/报错]
+    R --> T</pre><ul><li><strong>思想</strong>：用可执行代码代替 JSON 工具调用，一次代码可组合多个操作。</li><li><strong>场景</strong>：数据分析、自动化脚本、编程 Agent、复杂计算。</li><li><strong>优点</strong>：表达力强，可组合逻辑（循环、条件）。</li><li><strong>缺点</strong>：需要安全沙箱，有安全风险。</li></ul><h3 id=5-tot--got--lats树图搜索式推理><a href=#5-tot--got--lats%e6%a0%91%e5%9b%be%e6%90%9c%e7%b4%a2%e5%bc%8f%e6%8e%a8%e7%90%86 class=header-anchor></a>5. ToT / GoT / LATS（树/图搜索式推理）</h3><pre class=mermaid style=visibility:hidden>flowchart TD
+    R[问题] --> A[思路A]
+    R --> B[思路B]
+    R --> C[思路C]
+    A --> A1["A-1 ✗ 剪枝"]
+    A --> A2["A-2 ✓"]
+    B --> B1["B-1 ✗ 剪枝"]
+    A2 --> Z[最终解]</pre><ul><li><strong>思想</strong>：同时探索多条推理路径，评估、剪枝、回溯（LATS 结合 MCTS 蒙特卡洛树搜索）。</li><li><strong>场景</strong>：数学推理、规划类难题、代码生成、游戏、需要探索的任务。</li><li><strong>优点</strong>：解题成功率高。</li><li><strong>缺点</strong>：成本很高，延迟大。</li></ul><hr><h2 id=三自我改进模式><a href=#%e4%b8%89%e8%87%aa%e6%88%91%e6%94%b9%e8%bf%9b%e6%a8%a1%e5%bc%8f class=header-anchor></a>三、自我改进模式</h2><h3 id=6-reflection--reflexion--self-refine><a href=#6-reflection--reflexion--self-refine class=header-anchor></a>6. Reflection / Reflexion / Self-Refine</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    G[Generator 生成] --> C[Critic 批评/评估]
+    C -- 反馈 --> G
+    C -- 通过 --> O[输出]
+    C -.-> M[(反思记忆)]
+    M -.-> G</pre><ul><li><strong>Self-Refine</strong>：同一个模型生成、批评、改进，不依赖外部信号。</li><li><strong>Reflection</strong>：独立的 Critic 角色给出反馈。</li><li><strong>Reflexion</strong>：把反思结果存入记忆，用于后续尝试，适合多轮试错。</li><li><strong>场景</strong>：代码生成（结合单测反馈）、写作润色、复杂推理。</li><li><strong>缺点</strong>：增加延迟与成本；自我评估不可靠时可能原地打转。</li></ul><hr><h2 id=四工作流编排模式anthropic-总结的五种><a href=#%e5%9b%9b%e5%b7%a5%e4%bd%9c%e6%b5%81%e7%bc%96%e6%8e%92%e6%a8%a1%e5%bc%8fanthropic-%e6%80%bb%e7%bb%93%e7%9a%84%e4%ba%94%e7%a7%8d class=header-anchor></a>四、工作流编排模式（Anthropic 总结的五种）</h2><h3 id=7-prompt-chaining提示链><a href=#7-prompt-chaining%e6%8f%90%e7%a4%ba%e9%93%be class=header-anchor></a>7. Prompt Chaining（提示链）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    I[输入] --> S1[步骤1] --> G{校验 Gate} --> S2[步骤2] --> S3[步骤3] --> O[输出]
+    G -- 失败 --> X[终止/重试]</pre><ul><li><strong>场景</strong>：任务可清晰拆成固定子步骤，如"生成大纲→校验→写正文→翻译"。</li><li><strong>特点</strong>：用延迟换准确率，每步更简单。</li></ul><h3 id=8-routing路由><a href=#8-routing%e8%b7%af%e7%94%b1 class=header-anchor></a>8. Routing（路由）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    I[输入] --> R{Router 分类}
+    R -- 类型A --> A[专用处理A]
+    R -- 类型B --> B[专用处理B]
+    R -- 类型C --> C[专用处理C]</pre><ul><li><strong>场景</strong>：客服分流（退款/技术/咨询）、按难度选择大小模型。</li><li><strong>特点</strong>：关注点分离，每个分支可深度优化。</li></ul><h3 id=9-parallelization并行化><a href=#9-parallelization%e5%b9%b6%e8%a1%8c%e5%8c%96 class=header-anchor></a>9. Parallelization（并行化）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    I[输入] --> T1[子任务1]
+    I --> T2[子任务2]
+    I --> T3[子任务3]
+    T1 --> AG[聚合]
+    T2 --> AG
+    T3 --> AG</pre><ul><li><strong>Sectioning（分段）</strong>：独立子任务并行，如多文档摘要、内容审核与回答同时进行。</li><li><strong>Voting（投票）</strong>：同一任务多次执行取共识，如代码漏洞审查、提升可信度。</li></ul><h3 id=10-orchestrator-workers编排者-工作者><a href=#10-orchestrator-workers%e7%bc%96%e6%8e%92%e8%80%85-%e5%b7%a5%e4%bd%9c%e8%80%85 class=header-anchor></a>10. Orchestrator-Workers（编排者-工作者）</h3><pre class=mermaid style=visibility:hidden>flowchart TD
+    I[任务] --> O[Orchestrator 动态拆解]
+    O --> W1[Worker1]
+    O --> W2[Worker2]
+    O --> W3[WorkerN]
+    W1 --> S[Orchestrator 综合结果]
+    W2 --> S
+    W3 --> S</pre><ul><li><strong>场景</strong>：无法预知子任务数量的任务，如跨多文件的代码修改、多源调研。</li><li><strong>与 Parallelization 的区别</strong>：子任务是<strong>动态生成</strong>的，而非预定义的。</li></ul><h3 id=11-evaluator-optimizer评估者-优化者><a href=#11-evaluator-optimizer%e8%af%84%e4%bc%b0%e8%80%85-%e4%bc%98%e5%8c%96%e8%80%85 class=header-anchor></a>11. Evaluator-Optimizer（评估者-优化者）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    G[生成] --> E{评估}
+    E -- 不达标+反馈 --> G
+    E -- 达标 --> O[输出]</pre><ul><li><strong>场景</strong>：有明确评价标准的任务，如文学翻译、复杂搜索、代码质量迭代。</li><li><strong>与 Reflection 的关系</strong>：本质相同，前者强调工作流中的固定循环，后者强调 Agent 的自我反思能力。</li></ul><hr><h2 id=五多-agent-协作模式><a href=#%e4%ba%94%e5%a4%9a-agent-%e5%8d%8f%e4%bd%9c%e6%a8%a1%e5%bc%8f class=header-anchor></a>五、多 Agent 协作模式</h2><h3 id=12-supervisor监督者中心调度><a href=#12-supervisor%e7%9b%91%e7%9d%a3%e8%80%85%e4%b8%ad%e5%bf%83%e8%b0%83%e5%ba%a6 class=header-anchor></a>12. Supervisor（监督者/中心调度）</h3><pre class=mermaid style=visibility:hidden>flowchart TD
+    U[用户] --> S[Supervisor]
+    S <--> A[Agent A 研究]
+    S <--> B[Agent B 写作]
+    S <--> C[Agent C 代码]
+    S --> U</pre><ul><li><strong>特点</strong>：中心化调度，所有通信经过 Supervisor。</li><li><strong>场景</strong>：角色分工清晰的任务，如研究+写作+审核。</li><li><strong>优点</strong>：可控、易调试。<strong>缺点</strong>：Supervisor 是瓶颈和单点。</li></ul><h3 id=13-hierarchical层级式><a href=#13-hierarchical%e5%b1%82%e7%ba%a7%e5%bc%8f class=header-anchor></a>13. Hierarchical（层级式）</h3><pre class=mermaid style=visibility:hidden>flowchart TD
+    T[顶层 Manager] --> M1[中层 Team Lead A]
+    T --> M2[中层 Team Lead B]
+    M1 --> W1[Worker]
+    M1 --> W2[Worker]
+    M2 --> W3[Worker]
+    M2 --> W4[Worker]</pre><ul><li><strong>特点</strong>：多层 Supervisor，树状结构。</li><li><strong>场景</strong>：大型复杂项目，如软件开发团队（PM→架构→开发/测试）。</li><li><strong>优点</strong>：可扩展，上下文隔离。<strong>缺点</strong>：层级过深导致延迟高、信息损耗。</li></ul><h3 id=14-swarm--handoff群体交接><a href=#14-swarm--handoff%e7%be%a4%e4%bd%93%e4%ba%a4%e6%8e%a5 class=header-anchor></a>14. Swarm / Handoff（群体/交接）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    U[用户] --> A[分诊Agent]
+    A -- handoff --> B[销售Agent]
+    B -- handoff --> C[支付Agent]
+    C -- handoff --> D[售后Agent]
+    B -- handoff --> A</pre><ul><li><strong>特点</strong>：去中心化，Agent 自己决定把控制权交给谁（OpenAI Swarm / Agents SDK）。</li><li><strong>场景</strong>：客服流程、对话型多阶段业务。</li><li><strong>优点</strong>：轻量灵活。<strong>缺点</strong>：全局流程难把控，容易乒乓交接。</li></ul><h3 id=15-debate--critic辩论评审><a href=#15-debate--critic%e8%be%a9%e8%ae%ba%e8%af%84%e5%ae%a1 class=header-anchor></a>15. Debate / Critic（辩论/评审）</h3><pre class=mermaid style=visibility:hidden>flowchart LR
+    A[Agent 正方] <--> B[Agent 反方]
+    A --> J[Judge 裁判]
+    B --> J
+    J --> O[最终结论]</pre><ul><li><strong>场景</strong>：事实核查、决策分析、复杂推理、减少幻觉。</li><li><strong>缺点</strong>：Token 消耗大，可能出现从众效应。</li></ul><h3 id=16-blackboard黑板模式><a href=#16-blackboard%e9%bb%91%e6%9d%bf%e6%a8%a1%e5%bc%8f class=header-anchor></a>16. Blackboard（黑板模式）</h3><pre class=mermaid style=visibility:hidden>flowchart TD
+    BB[(共享黑板 Blackboard)]
+    A1[专家Agent1] <--> BB
+    A2[专家Agent2] <--> BB
+    A3[专家Agent3] <--> BB
+    C[控制器] --> BB</pre><ul><li><strong>特点</strong>：Agent 不直接通信，通过共享空间读写信息，谁能贡献谁就行动。</li><li><strong>场景</strong>：问题解法不确定、需要多专家增量贡献，如复杂诊断、情报分析。</li></ul><hr><h2 id=六能力增强类模式可与上述叠加><a href=#%e5%85%ad%e8%83%bd%e5%8a%9b%e5%a2%9e%e5%bc%ba%e7%b1%bb%e6%a8%a1%e5%bc%8f%e5%8f%af%e4%b8%8e%e4%b8%8a%e8%bf%b0%e5%8f%a0%e5%8a%a0 class=header-anchor></a>六、能力增强类模式（可与上述叠加）</h2><div class=table-wrapper><table><thead><tr><th>模式</th><th>核心</th><th>典型场景</th></tr></thead><tbody><tr><td><strong>Tool Use / Function Calling</strong></td><td>LLM 输出结构化调用，由外部执行（含 MCP 协议）</td><td>API 调用、数据库查询、搜索</td></tr><tr><td><strong>RAG / Agentic RAG</strong></td><td>检索外部知识增强生成；Agentic RAG 由 Agent 决定何时检索、检索什么、是否重检索</td><td>企业知识库问答、文档助手</td></tr><tr><td><strong>Memory-Augmented</strong></td><td>短期记忆（上下文）+ 长期记忆（向量库/KV/图谱）</td><td>个人助理、长期对话、经验学习</td></tr><tr><td><strong>Human-in-the-Loop</strong></td><td>关键节点人工审批/修正/介入</td><td>金融交易、发邮件、删数据、高风险操作</td></tr><tr><td><strong>State Machine / Graph Workflow</strong></td><td>用状态+边显式建模流程，支持循环、分支、持久化</td><td>复杂可控流程（LangGraph、Temporal 类）</td></tr></tbody></table></div><pre class=mermaid style=visibility:hidden>flowchart LR
+    A[Agent 决策] --> H{高风险操作?}
+    H -- 是 --> P[人工审批]
+    P -- 通过 --> X[执行]
+    P -- 拒绝 --> A
+    H -- 否 --> X</pre><hr><h2 id=七核心对比表><a href=#%e4%b8%83%e6%a0%b8%e5%bf%83%e5%af%b9%e6%af%94%e8%a1%a8 class=header-anchor></a>七、核心对比表</h2><h3 id=1-单-agent-推理模式对比><a href=#1-%e5%8d%95-agent-%e6%8e%a8%e7%90%86%e6%a8%a1%e5%bc%8f%e5%af%b9%e6%af%94 class=header-anchor></a>1. 单 Agent 推理模式对比</h3><div class=table-wrapper><table><thead><tr><th>模式</th><th>规划方式</th><th>LLM调用次数</th><th>灵活性</th><th>成本</th><th>适用任务</th></tr></thead><tbody><tr><td>ReAct</td><td>边做边想</td><td>多</td><td>⭐⭐⭐⭐⭐</td><td>中高</td><td>探索性、不确定任务</td></tr><tr><td>Plan-and-Execute</td><td>先整体规划</td><td>中</td><td>⭐⭐⭐</td><td>中</td><td>长链路、结构清晰任务</td></tr><tr><td>ReWOO</td><td>一次性规划+占位</td><td>少</td><td>⭐⭐</td><td>低</td><td>步骤确定、成本敏感</td></tr><tr><td>CodeAct</td><td>以代码行动</td><td>中</td><td>⭐⭐⭐⭐</td><td>中</td><td>计算/数据/编程</td></tr><tr><td>ToT / LATS</td><td>多路径搜索</td><td>极多</td><td>⭐⭐⭐⭐</td><td>很高</td><td>高难度推理</td></tr><tr><td>Reflection</td><td>生成-批评循环</td><td>多</td><td>⭐⭐⭐</td><td>中高</td><td>质量要求高</td></tr></tbody></table></div><h3 id=2-工作流模式对比><a href=#2-%e5%b7%a5%e4%bd%9c%e6%b5%81%e6%a8%a1%e5%bc%8f%e5%af%b9%e6%af%94 class=header-anchor></a>2. 工作流模式对比</h3><div class=table-wrapper><table><thead><tr><th>模式</th><th>流程是否预定义</th><th>核心价值</th><th>典型例子</th></tr></thead><tbody><tr><td>Prompt Chaining</td><td>完全固定</td><td>拆解降低难度</td><td>大纲→正文→润色</td></tr><tr><td>Routing</td><td>分支固定</td><td>分流、专业化</td><td>客服分类</td></tr><tr><td>Parallelization</td><td>并行结构固定</td><td>提速/提升置信度</td><td>多维度审核、投票</td></tr><tr><td>Orchestrator-Workers</td><td>子任务动态</td><td>处理不可预知拆分</td><td>多文件代码改动</td></tr><tr><td>Evaluator-Optimizer</td><td>循环结构固定</td><td>迭代提质</td><td>翻译、代码优化</td></tr></tbody></table></div><h3 id=3-多-agent-模式对比><a href=#3-%e5%a4%9a-agent-%e6%a8%a1%e5%bc%8f%e5%af%b9%e6%af%94 class=header-anchor></a>3. 多 Agent 模式对比</h3><div class=table-wrapper><table><thead><tr><th>模式</th><th>控制方式</th><th>通信方式</th><th>可控性</th><th>扩展性</th><th>适用场景</th></tr></thead><tbody><tr><td>Supervisor</td><td>中心化</td><td>星型</td><td>高</td><td>中</td><td>分工明确的团队任务</td></tr><tr><td>Hierarchical</td><td>分层中心化</td><td>树型</td><td>高</td><td>高</td><td>大型复杂项目</td></tr><tr><td>Swarm/Handoff</td><td>去中心化</td><td>点对点交接</td><td>低</td><td>中</td><td>对话流程接力</td></tr><tr><td>Debate</td><td>对抗+裁判</td><td>多轮互相辩论</td><td>中</td><td>低</td><td>决策、核查</td></tr><tr><td>Blackboard</td><td>共享状态驱动</td><td>间接通信</td><td>中</td><td>高</td><td>解法不确定的协作</td></tr></tbody></table></div><hr><h2 id=八易混淆概念辨析><a href=#%e5%85%ab%e6%98%93%e6%b7%b7%e6%b7%86%e6%a6%82%e5%bf%b5%e8%be%a8%e6%9e%90 class=header-anchor></a>八、易混淆概念辨析</h2><div class=table-wrapper><table><thead><tr><th>对比</th><th>区别</th></tr></thead><tbody><tr><td><strong>ReAct vs Plan-and-Execute</strong></td><td>ReAct 走一步看一步，适应性强；P&amp;E 先有全局计划，更适合长任务，但要处理计划失效。</td></tr><tr><td><strong>Plan-and-Execute vs ReWOO</strong></td><td>P&amp;E 每步执行后可能重规划；ReWOO 规划一次后不看中间结果，直接批量执行。</td></tr><tr><td><strong>Reflection vs Evaluator-Optimizer</strong></td><td>思想一致。前者偏 Agent 自省，后者偏工作流中的评估循环。</td></tr><tr><td><strong>Parallelization vs Orchestrator-Workers</strong></td><td>前者子任务预定义；后者由 LLM 动态拆解。</td></tr><tr><td><strong>Supervisor vs Swarm</strong></td><td>Supervisor 中心调度；Swarm 由 Agent 自主交接，无中心。</td></tr><tr><td><strong>Workflow vs Agent</strong></td><td>Workflow 由代码决定流程；Agent 由 LLM 决定流程。</td></tr><tr><td><strong>Orchestrator-Workers vs Supervisor</strong></td><td>前者通常是单次任务内的动态拆分，Worker 无独立身份；后者是多个有独立角色和能力的 Agent。</td></tr></tbody></table></div><hr><h2 id=九选型决策流程><a href=#%e4%b9%9d%e9%80%89%e5%9e%8b%e5%86%b3%e7%ad%96%e6%b5%81%e7%a8%8b class=header-anchor></a>九、选型决策流程</h2><pre class=mermaid style=visibility:hidden>flowchart TD
+    S[开始] --> Q1{单次 LLM 调用+RAG+工具 能解决?}
+    Q1 -- 是 --> R1[直接使用 Tool Use / RAG]
+    Q1 -- 否 --> Q2{流程是否可预先确定?}
+    Q2 -- 是 --> Q3{需要分流/并行/迭代?}
+    Q3 -- 分流 --> W1[Routing]
+    Q3 -- 并行 --> W2[Parallelization]
+    Q3 -- 迭代提质 --> W3[Evaluator-Optimizer]
+    Q3 -- 线性步骤 --> W4[Prompt Chaining]
+    Q2 -- 否 --> Q4{单个Agent上下文/能力足够?}
+    Q4 -- 是 --> Q5{任务特点}
+    Q5 -- 探索性 --> A1[ReAct]
+    Q5 -- 长链路 --> A2[Plan-and-Execute]
+    Q5 -- 成本敏感 --> A3[ReWOO]
+    Q5 -- 计算/编程 --> A4[CodeAct]
+    Q5 -- 高难推理 --> A5[ToT / LATS]
+    Q4 -- 否 --> Q6{协作结构}
+    Q6 -- 角色分工清晰 --> M1[Supervisor]
+    Q6 -- 规模庞大 --> M2[Hierarchical]
+    Q6 -- 流程接力 --> M3[Swarm / Handoff]
+    Q6 -- 需要多视角 --> M4[Debate]
+    Q6 -- 解法不确定 --> M5[Blackboard]</pre></section><footer class="article-meta article-footer"><section class=article-tags><a href=/tags/agent/>Agent</a></section></footer><nav class=article-prevnext aria-label=相邻文章><a class="article-prevnext__item article-prevnext__item--older" href=/p/rbac/ rel=prev><span class=article-prevnext__label><svg class="article-prevnext__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+<span>上一篇</span>
+</span><span class=article-prevnext__title>权限模型设计</span>
+<span class=article-prevnext__date>2026.08.08</span></a></nav></article><script type=module>
+    import gallery from '\/ts\/gallery.js';
+
+    const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+    const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+    const coreHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js";
+
+    let styleInjected = false;
+    let lightboxReady = false;
+
+    const setup = (container) => {
+        if (!container || container.dataset.galleryDone === '1') return;
+
+        const hasImages = container.querySelectorAll('figure.gallery-image').length > 0
+            || container.querySelectorAll('img.gallery-image').length > 0;
+        
+        if (!hasImages) return;
+
+        gallery(container);
+
+        if (!styleInjected) {
+            const styleTag = document.createElement('link');
+            styleTag.rel = 'stylesheet';
+            styleTag.href = styleHref;
+            document.head.appendChild(styleTag);
+            styleInjected = true;
+        }
+
+        if (!lightboxReady) {
+            const lightbox = new PhotoSwipeLightbox({
+                gallerySelector: '.article-content',
+                childSelector: 'figure a.image-link',
+                pswpModule: () => import(coreHref)
+            });
+            lightbox.init();
+            lightboxReady = true;
+        }
+
+        container.dataset.galleryDone = '1';
+    };
+
+    window.__yqwGallery = setup;
+
+    
+    setup(document.querySelector('.article-content'));
+</script><div class=mermaid-modal id=mermaid-modal><div class=mermaid-modal-header><div class=mermaid-modal-controls><button data-zoom=-1>− Zoom Out</button>
+<button data-zoom=0>Reset (100%)</button>
+<button data-zoom=1>+ Zoom In</button>
+<button data-zoom=fit>Fit to Screen</button></div><button class=mermaid-modal-close id=mermaid-modal-close>✕ Close (Esc)</button></div><div class=mermaid-modal-body id=mermaid-modal-body><div class=mermaid-modal-content id=mermaid-modal-content></div></div></div><script src=https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js></script><script type=module>
+import { initMermaidPage } from '\/ts\/mermaid.js';
+initMermaidPage({"darkTheme":"dark","darkThemeVariables":{},"htmlLabels":true,"lightTheme":"default","lightThemeVariables":{},"look":"classic","securityLevel":"strict","transparentBackground":false});
+</script></main><footer class=site-footer><div class=site-footer__inner><div class=site-footer__cta><h2>有想法？<br><span>我们聊聊。</span></h2><a class=site-footer__email href=mailto:yuqiuwen2020@gmail.com>yuqiuwen2020@gmail.com ↗</a></div><div class=site-footer__bottom><span>© 2026 Yu Qiuwen</span><div class=site-footer__social><a href=mailto:yuqiuwen2020@gmail.com><svg class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg>
+<span>Email</span>
+</a><a href=https://github.com/yuqiuwen target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+<span>GitHub</span>
+</a><a href=/index.xml target=_blank rel=noopener><svg class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="5" cy="19" r="1"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg>
+<span>RSS</span></a></div></div></div></footer><script src=/js/gate.min.fe0f629f76f0348a4068bb6ac4c756752f7cf9f2eac1352ad0a653685a8740e2.js integrity="sha256-/g9in3bwNIpAaLtqxMdWdS98+fLqwTUq0KZTaFqHQOI=" defer></script><script type=text/javascript src=/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js defer></script></body></html>
